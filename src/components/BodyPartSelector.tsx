@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { BodyPart } from "@/types";
-import { Dumbbell, Heart, Biceps, Scale, BicepsFlexed, Timer, Activity, Weight } from "lucide-react";
+import { Dumbbell, Heart, Scale, Timer, Activity, Weight } from "lucide-react";
 
 type BodyPartSelectorProps = {
   onSave: (bodyParts: BodyPart[]) => void;
@@ -13,10 +12,10 @@ type BodyPartSelectorProps = {
 };
 
 const bodyPartOptions: { value: BodyPart; label: string; icon: React.ReactNode }[] = [
-  { value: "chest", label: "Brust", icon: <BicepsFlexed className="w-5 h-5 mr-2" /> },
+  { value: "chest", label: "Brust", icon: <Dumbbell className="w-5 h-5 mr-2" /> },
   { value: "back", label: "Rücken", icon: <Weight className="w-5 h-5 mr-2" /> },
   { value: "shoulders", label: "Schultern", icon: <Dumbbell className="w-5 h-5 mr-2" /> },
-  { value: "biceps", label: "Bizeps", icon: <Biceps className="w-5 h-5 mr-2" /> },
+  { value: "biceps", label: "Bizeps", icon: <Dumbbell className="w-5 h-5 mr-2" /> },
   { value: "triceps", label: "Trizeps", icon: <Dumbbell className="w-5 h-5 mr-2" /> },
   { value: "legs", label: "Beine", icon: <Weight className="w-5 h-5 mr-2" /> },
   { value: "abs", label: "Bauch", icon: <Scale className="w-5 h-5 mr-2" /> },
