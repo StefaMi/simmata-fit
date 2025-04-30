@@ -1,4 +1,3 @@
-
 import { UserProfile, BodyPart, WorkoutPlan, NutritionPlan, Exercise, NutritionEntry } from "@/types";
 import { getExercisesByBodyPart } from "@/data/exercises";
 import { getMealsByType } from "@/data/nutrition";
@@ -87,19 +86,13 @@ export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): 
     // Nehme alle verfügbaren Übungen für diesen Körperteil
     allExercises.push(...bodyPartExercises);
   });
-
-  // Aktualisiere die Video-URLs für alle Übungen
-  const exercisesWithUpdatedVideos = allExercises.map(exercise => ({
-    ...exercise,
-    videoUrl: `https://www.youtube.com/@workoutendomondo/shorts`
-  }));
   
   // Trainingstage erstellen
   const days: { [key: string]: Exercise[] } = {};
   const daysOfWeek = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
   
   // Berechne die Mindestanzahl von Übungen pro Tag (mindestens 3-5)
-  const totalExercises = exercisesWithUpdatedVideos.length;
+  const totalExercises = allExercises.length;
   const minExercisesPerDay = Math.max(3, Math.min(5, Math.ceil(totalExercises / workoutFrequency)));
   
   // Verteile die Übungen gleichmäßig auf die Trainingstage
@@ -121,8 +114,8 @@ export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): 
     
     // Füge die Übungen für diesen Tag hinzu
     for (let j = startIndex; j < endIndex; j++) {
-      if (j < exercisesWithUpdatedVideos.length) {
-        dayExercises.push(exercisesWithUpdatedVideos[j]);
+      if (j < allExercises.length) {
+        dayExercises.push(allExercises[j]);
       }
     }
     
@@ -138,7 +131,7 @@ export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): 
     name: "Personalisierter Trainingsplan",
     description: `Trainingsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"}`,
     frequency: workoutFrequency,
-    exercises: exercisesWithUpdatedVideos,
+    exercises: allExercises,
     days: days
   };
 };
