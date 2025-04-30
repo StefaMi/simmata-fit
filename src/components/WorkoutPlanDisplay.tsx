@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Exercise, WorkoutPlan } from "@/types";
-import { Dumbbell, ExternalLink } from "lucide-react";
+import { Dumbbell, ExternalLink, Calendar } from "lucide-react";
 
 type WorkoutPlanDisplayProps = {
   workoutPlan: WorkoutPlan;
@@ -19,39 +19,52 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
           <Dumbbell className="h-6 w-6 text-fitness-primary" />
           {workoutPlan.name}
         </CardTitle>
-        <CardDescription>{workoutPlan.description}</CardDescription>
+        <CardDescription className="flex items-center gap-2">
+          <Calendar className="h-4 w-4" />
+          {workoutPlan.description} • {workoutPlan.frequency}x pro Woche
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue={dayNames[0]}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
-            {dayNames.map((day) => (
-              <TabsTrigger key={day} value={day}>
-                {day}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        {dayNames.length > 0 ? (
+          <Tabs defaultValue={dayNames[0]}>
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
+              {dayNames.map((day) => (
+                <TabsTrigger key={day} value={day}>
+                  {day}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-          {dayNames.map((day) => (
-            <TabsContent key={day} value={day}>
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold">{day} Training</h3>
-                {workoutPlan.days[day].length === 0 ? (
-                  <p className="text-muted-foreground">Ruhetag</p>
-                ) : (
-                  <div className="space-y-4">
-                    {workoutPlan.days[day].map((exercise) => (
-                      <ExerciseCard key={exercise.id} exercise={exercise} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+            {dayNames.map((day) => (
+              <TabsContent key={day} value={day}>
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold">{day} Training</h3>
+                  {workoutPlan.days[day].length === 0 ? (
+                    <p className="text-muted-foreground">Ruhetag</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {workoutPlan.days[day].map((exercise) => (
+                        <ExerciseCard key={exercise.id} exercise={exercise} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        ) : (
+          <div className="p-6 text-center">
+            <p className="text-muted-foreground">
+              Es konnten keine passenden Übungen für deine Auswahl gefunden werden.
+              Bitte wähle andere Körperteile aus.
+            </p>
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">
-          Dieser Plan ist auf deine Ziele und Trainingsfrequenz angepasst. Passe das Training nach Bedarf an und achte auf die richtige Ausführung.
+          Dieser Plan ist auf deine Ziele und Trainingsfrequenz ({workoutPlan.frequency}x pro Woche) angepasst. 
+          Passe das Training nach Bedarf an und achte auf die richtige Ausführung.
         </p>
       </CardFooter>
     </Card>
@@ -70,7 +83,7 @@ const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
           <div>
             <h4 className="text-md font-semibold">{exercise.name}</h4>
             <p className="text-sm text-muted-foreground">{exercise.description}</p>
-            <div className="flex gap-x-6 mt-2">
+            <div className="flex flex-wrap gap-x-6 mt-2">
               <div className="text-sm">
                 <span className="font-medium">Sätze:</span> {exercise.sets}
               </div>

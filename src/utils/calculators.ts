@@ -75,6 +75,23 @@ export const calculateMacros = (profile: UserProfile): { protein: number, carbs:
   return { protein, carbs, fat };
 };
 
+// Bestimmt die optimale Trainingshäufigkeit basierend auf dem Nutzerprofil
+const determineWorkoutFrequency = (profile: UserProfile): number => {
+  switch (profile.activityLevel) {
+    case "sedentary":
+      return 3; // 3 Tage pro Woche für Anfänger
+    case "light":
+      return 4; // 4 Tage pro Woche für leicht Aktive
+    case "moderate":
+      return 5; // 5 Tage pro Woche für mäßig Aktive
+    case "active":
+    case "veryActive":
+      return 6; // 6 Tage pro Woche für sehr Aktive
+    default:
+      return 4;
+  }
+};
+
 // Erstellt einen Trainingsplan basierend auf den gewählten Körperteilen
 export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): WorkoutPlan => {
   const workoutFrequency = determineWorkoutFrequency(profile);
@@ -95,62 +112,124 @@ export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): 
   const totalExercises = allExercises.length;
   const minExercisesPerDay = Math.max(3, Math.min(5, Math.ceil(totalExercises / workoutFrequency)));
   
-  // Verteile die Übungen gleichmäßig auf die Trainingstage
-  // Wir verwenden nur so viele Tage wie in workoutFrequency definiert
-  for (let i = 0; i < workoutFrequency; i++) {
-    const dayExercises: Exercise[] = [];
-    const dayIndex = i % daysOfWeek.length;
+  // Shuffle the exercises array to get a more varied distribution
+  const shuffledExercises = [...allExercises].sort(() => Math.random() - 0.5);
+  
+  // Clear any previous days first
+  for (let i = 0; i < daysOfWeek.length; i++) {
+    days[daysOfWeek[i]] = [];
+  }
+  
+  // Distribute exercises based on body parts (grouping similar exercises)
+  // This creates a more focused workout per day, similar to Freeletics approach
+  const groupedByBodyPart: Record<BodyPart, Exercise[]> = {} as Record<BodyPart, Exercise[]>;
+  
+  bodyParts.forEach(bodyPart => {
+    groupedByBodyPart[bodyPart] = shuffledExercises.filter(ex => ex.bodyPart === bodyPart);
+  });
+  
+  // Assign body parts to specific days of the week
+  const assignedDays: Record<number, BodyPart[]> = {};
+  
+  // First, distribute primary body parts across workout days
+  let dayIndex = 0;
+  for (const bodyPart of bodyParts) {
+    if (dayIndex >= workoutFrequency) break;
     
-    // Bestimme den Bereich der Übungen für diesen Tag
-    const exercisesPerDay = Math.ceil(totalExercises / workoutFrequency);
-    const startIndex = i * exercisesPerDay;
-    let endIndex = Math.min((i + 1) * exercisesPerDay, totalExercises);
-    
-    // Stelle sicher, dass wir mindestens minExercisesPerDay Übungen haben
-    if (endIndex - startIndex < minExercisesPerDay && startIndex < totalExercises) {
-      // Wenn nicht genug Übungen für diesen Tag, nehmen wir was verfügbar ist
-      endIndex = Math.min(startIndex + minExercisesPerDay, totalExercises);
+    if (!assignedDays[dayIndex]) {
+      assignedDays[dayIndex] = [];
     }
     
-    // Füge die Übungen für diesen Tag hinzu
-    for (let j = startIndex; j < endIndex; j++) {
-      if (j < allExercises.length) {
-        dayExercises.push(allExercises[j]);
+    assignedDays[dayIndex].push(bodyPart);
+    dayIndex = (dayIndex + 1) % workoutFrequency;
+  }
+  
+  // Then add secondary assignments to ensure each workout day has enough variety
+  dayIndex = 0;
+  for (const bodyPart of bodyParts) {
+    // Skip if this would create too many exercises per day
+    if (groupedByBodyPart[bodyPart].length < 2) continue;
+    
+    // Add as secondary focus to another day
+    const secondaryDayIndex = (dayIndex + 2) % workoutFrequency;
+    if (!assignedDays[secondaryDayIndex]) {
+      assignedDays[secondaryDayIndex] = [];
+    }
+    
+    if (!assignedDays[secondaryDayIndex].includes(bodyPart)) {
+      assignedDays[secondaryDayIndex].push(bodyPart);
+    }
+    
+    dayIndex = (dayIndex + 1) % workoutFrequency;
+  }
+  
+  // Create the workouts for each active day
+  for (let i = 0; i < workoutFrequency; i++) {
+    const dayExercises: Exercise[] = [];
+    const currentDayName = daysOfWeek[i];
+    const bodyPartsForDay = assignedDays[i] || [];
+    
+    // Add exercises from each assigned body part
+    for (const bodyPart of bodyPartsForDay) {
+      const availableExercises = groupedByBodyPart[bodyPart];
+      
+      // Take 2-3 exercises from this body part
+      const exercisesToTake = Math.min(
+        Math.max(2, Math.ceil(minExercisesPerDay / bodyPartsForDay.length)), 
+        availableExercises.length
+      );
+      
+      for (let j = 0; j < exercisesToTake; j++) {
+        if (j < availableExercises.length) {
+          // Don't add duplicates
+          if (!dayExercises.find(e => e.id === availableExercises[j].id)) {
+            dayExercises.push(availableExercises[j]);
+          }
+        }
       }
     }
     
-    // Wenn wir keine Übungen mehr haben oder alle verteilt haben, beende die Schleife
-    if (dayExercises.length === 0) break;
+    // If we still need more exercises to reach minimum, add from other body parts
+    if (dayExercises.length < minExercisesPerDay) {
+      for (const bodyPart of bodyParts) {
+        if (dayExercises.length >= minExercisesPerDay) break;
+        if (bodyPartsForDay.includes(bodyPart)) continue; // Skip already used body parts
+        
+        const availableExercises = groupedByBodyPart[bodyPart];
+        for (const exercise of availableExercises) {
+          if (dayExercises.length >= minExercisesPerDay) break;
+          if (!dayExercises.find(e => e.id === exercise.id)) {
+            dayExercises.push(exercise);
+          }
+        }
+      }
+    }
     
-    // Füge den Tag zum Trainingsplan hinzu
-    days[daysOfWeek[dayIndex]] = dayExercises;
+    // Assign exercises to this day if we have any
+    if (dayExercises.length > 0) {
+      days[currentDayName] = dayExercises;
+    }
   }
   
+  // Make sure rest days are clearly marked by removing the empty days from the plan
+  const finalDays: { [key: string]: Exercise[] } = {};
+  const activeDays = daysOfWeek.slice(0, workoutFrequency);
+  
+  activeDays.forEach((day, index) => {
+    if (days[day].length > 0) {
+      finalDays[day] = days[day];
+    }
+  });
+  
+  // Update the final workout plan
   return {
     id: "wp" + Date.now().toString(),
     name: "Personalisierter Trainingsplan",
-    description: `Trainingsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"}`,
+    description: `Trainingsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"} (${workoutFrequency}x pro Woche)`,
     frequency: workoutFrequency,
     exercises: allExercises,
-    days: days
+    days: finalDays
   };
-};
-
-// Bestimmt die optimale Trainingshäufigkeit basierend auf dem Nutzerprofil
-const determineWorkoutFrequency = (profile: UserProfile): number => {
-  switch (profile.activityLevel) {
-    case "sedentary":
-      return 3; // 3 Tage pro Woche für Anfänger
-    case "light":
-      return 4; // 4 Tage pro Woche für leicht Aktive
-    case "moderate":
-      return 5; // 5 Tage pro Woche für mäßig Aktive
-    case "active":
-    case "veryActive":
-      return 6; // 6 Tage pro Woche für sehr Aktive
-    default:
-      return 4;
-  }
 };
 
 // Erstellt einen Ernährungsplan basierend auf dem Nutzerprofil
