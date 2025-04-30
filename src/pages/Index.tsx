@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
-import { Dumbbell, Heart, User, ArrowUp, Activity, Scale } from "lucide-react";
+import { Dumbbell, Heart, User, ArrowUp, Activity, Scale, Wind, Music, TrendingUp } from "lucide-react";
 import Layout from "@/components/Layout";
+import DailyQuote from "@/components/DailyQuote";
 
 const Index = () => {
   const { toast } = useToast();
@@ -31,6 +32,20 @@ const Index = () => {
       icon: <Heart className="h-6 w-6 text-fitness-primary" />,
       link: "/nutrition",
       buttonText: "Zur Ernährung",
+    },
+    {
+      title: "Atem & Fokus",
+      description: "Verbessere deine geistige Fitness mit Nesma-inspirierten Atem- und Konzentrationsübungen.",
+      icon: <Wind className="h-6 w-6 text-fitness-primary" />,
+      link: "/focus",
+      buttonText: "Zu den Übungen",
+    },
+    {
+      title: "Fortschritt",
+      description: "Verfolge deinen Fortschritt und dokumentiere deine Erfolge auf dem Weg zu deinen Zielen.",
+      icon: <TrendingUp className="h-6 w-6 text-fitness-primary" />,
+      link: "/progress",
+      buttonText: "Zum Fortschritt",
     },
   ];
 
@@ -81,6 +96,9 @@ const Index = () => {
             </Button>
           </div>
         </div>
+        
+        {/* Daily Quote */}
+        <DailyQuote />
 
         {/* Statistiken */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -143,13 +161,16 @@ const Index = () => {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Music Integration Teaser */}
         <Card className="bg-gradient-to-r from-fitness-primary to-fitness-secondary text-white">
           <CardContent className="p-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="space-y-2">
-              <h3 className="text-2xl font-bold">Bereit für deine Fitness-Reise?</h3>
+              <div className="flex items-center gap-2">
+                <Music className="h-6 w-6" />
+                <h3 className="text-2xl font-bold">Musik für dein Training</h3>
+              </div>
               <p className="text-white/80">
-                Beginne jetzt mit der Erstellung deines personalisierten Plans.
+                Verbinde deine Apple Music oder Spotify-Playlists für ein optimales Trainingserlebnis.
               </p>
             </div>
             <Button 
@@ -157,7 +178,7 @@ const Index = () => {
               size="lg"
               asChild
             >
-              <Link to="/profile">Jetzt starten</Link>
+              <Link to="/workout">Jetzt starten</Link>
             </Button>
           </CardContent>
         </Card>

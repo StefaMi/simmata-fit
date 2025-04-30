@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import BodyPartSelector from "@/components/BodyPartSelector";
+import EquipmentSelector from "@/components/EquipmentSelector";
 import WorkoutPlanDisplay from "@/components/WorkoutPlanDisplay";
 import { BodyPart, UserProfile, WorkoutPlan, Exercise } from "@/types";
 import Layout from "@/components/Layout";
@@ -8,6 +9,8 @@ import { createWorkoutPlan } from "@/utils/calculators";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import ProgressTracker from "@/components/ProgressTracker";
+import DailyQuote from "@/components/DailyQuote";
 
 // Define step types for better clarity
 type WorkoutStep = 1 | 2;
@@ -16,8 +19,10 @@ const WorkoutPage = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<WorkoutStep>(1);
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>([]);
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>(['bodyweight', 'dumbbells']);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [progressEntries, setProgressEntries] = useState<any[]>([]);
 
   // Lade das Nutzerprofil beim ersten Rendern
   useEffect(() => {
@@ -45,6 +50,16 @@ const WorkoutPage = () => {
         setStep(2); // Springe direkt zur Anzeige des Plans
       } catch (error) {
         console.error("Fehler beim Parsen des gespeicherten Trainingsplans:", error);
+      }
+    }
+    
+    // Load progress entries
+    const savedEntries = localStorage.getItem("progressEntries");
+    if (savedEntries) {
+      try {
+        setProgressEntries(JSON.parse(savedEntries));
+      } catch (error) {
+        console.error("Error parsing progress entries:", error);
       }
     }
   }, []);
@@ -159,11 +174,20 @@ const WorkoutPage = () => {
     localStorage.removeItem("workoutPlan");
   };
 
+  const handleProgressUpdate = (entry: any) => {
+    const updatedEntries = [entry, ...progressEntries];
+    setProgressEntries(updatedEntries);
+    localStorage.setItem("progressEntries", JSON.stringify(updatedEntries));
+  };
+
   console.log("Current step:", step, "Workout plan exists:", !!workoutPlan);
 
   return (
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Show the daily quote at the top */}
+        <DailyQuote />
+
         {!userProfile && step === 1 ? (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
             <div className="flex">
@@ -182,7 +206,10 @@ const WorkoutPage = () => {
         ) : null}
 
         {step === 1 ? (
-          <BodyPartSelector onSave={handleSaveBodyParts} initialSelection={selectedParts} />
+          <>
+            <BodyPartSelector onSave={handleSaveBodyParts} initialSelection={selectedParts} />
+            <EquipmentSelector onChange={setSelectedEquipment} initialSelection={['bodyweight', 'dumbbells']} />
+          </>
         ) : null}
 
         {step === 2 && workoutPlan ? (
@@ -198,6 +225,17 @@ const WorkoutPage = () => {
               </Button>
             </div>
             <WorkoutPlanDisplay workoutPlan={workoutPlan} />
+            
+            {/* Progress Tracker */}
+            {userProfile && (
+              <div className="mt-8">
+                <ProgressTracker 
+                  userProfile={userProfile}
+                  onProgressUpdate={handleProgressUpdate}
+                  latestEntry={progressEntries.length > 0 ? progressEntries[0] : undefined}
+                />
+              </div>
+            )}
           </>
         ) : null}
       </div>

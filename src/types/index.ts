@@ -36,6 +36,7 @@ export type Exercise = {
   sets: number;
   reps: number;
   restTime: number;
+  equipmentType?: 'bodyweight' | 'dumbbells' | 'barbell' | 'machine' | 'other';
 };
 
 // Typen für Trainingspläne
@@ -62,4 +63,52 @@ export type NutritionPlan = {
   meals: {
     [key: string]: NutritionEntry[];
   };
+};
+
+// Typen für Atem- & Fokus-Übungen
+export type FocusExercise = {
+  id: string;
+  name: string;
+  description: string;
+  duration: number; // in Sekunden
+  type: 'breathing' | 'meditation' | 'focus' | 'nesma';
+  instructions: string;
+  videoUrl?: string;
+};
+
+// Typen für Progress-Tracking
+export type ProgressEntry = {
+  id: string;
+  date: string;
+  weight: number;
+  measurements?: {
+    chest?: number;
+    waist?: number;
+    hips?: number;
+    thighs?: number;
+    arms?: number;
+  };
+  notes?: string;
+  workoutCompleted?: boolean;
+  nutritionCompleted?: boolean;
+};
+
+// Typen für Motivations-Zitate
+export type MotivationalQuote = {
+  id: string;
+  quoteAssyrian: string;
+  quoteGerman: string;
+  author?: string;
+};
+
+// Typen für Musik-Integration
+export type MusicProvider = 'spotify' | 'apple';
+
+export type MusicPlaylist = {
+  id: string;
+  name: string;
+  provider: MusicProvider;
+  url: string;
+  imageUrl?: string;
+  description?: string;
 };

@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import ProfilePage from "./pages/ProfilePage";
 import WorkoutPage from "./pages/WorkoutPage";
 import NutritionPage from "./pages/NutritionPage";
+import FocusPage from "./pages/FocusPage"; 
+import ProgressPage from "./pages/ProgressPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,8 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/workout" element={<WorkoutPage />} />
             <Route path="/nutrition" element={<NutritionPage />} />
+            <Route path="/focus" element={<FocusPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
