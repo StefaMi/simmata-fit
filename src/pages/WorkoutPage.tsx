@@ -64,7 +64,7 @@ const WorkoutPage = () => {
       return;
     }
     
-    // Erstelle den Trainingsplan
+    // Erstelle den Trainingsplan - passing custom frequency (default will come from profile)
     const plan = createWorkoutPlan(bodyParts, userProfile);
     console.log("Created workout plan:", plan);
     setWorkoutPlan(plan);
@@ -74,7 +74,7 @@ const WorkoutPage = () => {
     
     toast({
       title: "Trainingsplan erstellt",
-      description: "Dein personalisierter Trainingsplan wurde erstellt.",
+      description: "Dein personalisierter Trainingsplan wurde erstellt. Du kannst die Trainingshäufigkeit jederzeit anpassen.",
     });
     
     setStep(2);

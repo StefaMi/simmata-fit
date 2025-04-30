@@ -4,13 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Exercise, WorkoutPlan } from "@/types";
 import { Dumbbell, ExternalLink, Calendar } from "lucide-react";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 type WorkoutPlanDisplayProps = {
   workoutPlan: WorkoutPlan;
 };
 
 const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
+  const [frequency, setFrequency] = useState<number>(workoutPlan.frequency);
   const dayNames = Object.keys(workoutPlan.days);
+  
+  // Filter days based on selected frequency
+  const availableDays = dayNames.slice(0, frequency);
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -21,21 +28,44 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
         </CardTitle>
         <CardDescription className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          {workoutPlan.description} • {workoutPlan.frequency}x pro Woche
+          {workoutPlan.description}
         </CardDescription>
+        
+        <div className="mt-4 flex flex-col gap-2">
+          <Label htmlFor="frequency-select">Trainingshäufigkeit anpassen:</Label>
+          <Select 
+            value={String(frequency)} 
+            onValueChange={(value) => setFrequency(Number(value))}
+          >
+            <SelectTrigger id="frequency-select" className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Wähle Trainingshäufigkeit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2">2x pro Woche</SelectItem>
+              <SelectItem value="3">3x pro Woche</SelectItem>
+              <SelectItem value="4">4x pro Woche</SelectItem>
+              <SelectItem value="5">5x pro Woche</SelectItem>
+              <SelectItem value="6">6x pro Woche</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground">
+            Passe deine Trainingshäufigkeit an deinen Zeitplan an. 
+            Das Training wird automatisch auf {frequency} Tage verteilt.
+          </p>
+        </div>
       </CardHeader>
       <CardContent>
-        {dayNames.length > 0 ? (
-          <Tabs defaultValue={dayNames[0]}>
+        {availableDays.length > 0 ? (
+          <Tabs defaultValue={availableDays[0]}>
             <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
-              {dayNames.map((day) => (
+              {availableDays.map((day) => (
                 <TabsTrigger key={day} value={day}>
                   {day}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {dayNames.map((day) => (
+            {availableDays.map((day) => (
               <TabsContent key={day} value={day}>
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold">{day} Training</h3>
@@ -63,7 +93,7 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">
-          Dieser Plan ist auf deine Ziele und Trainingsfrequenz ({workoutPlan.frequency}x pro Woche) angepasst. 
+          Dieser Plan ist auf deine Ziele und Trainingsfrequenz ({frequency}x pro Woche) angepasst. 
           Passe das Training nach Bedarf an und achte auf die richtige Ausführung.
         </p>
       </CardFooter>
