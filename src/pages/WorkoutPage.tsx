@@ -49,6 +49,13 @@ const WorkoutPage = () => {
     }
   }, []);
 
+  // Watch for changes to the workout plan and save to localStorage
+  useEffect(() => {
+    if (workoutPlan) {
+      localStorage.setItem("workoutPlan", JSON.stringify(workoutPlan));
+    }
+  }, [workoutPlan]);
+
   // Handler für die Auswahl der Körperteile
   const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
     console.log("handleSaveBodyParts called with:", bodyParts);
@@ -64,13 +71,16 @@ const WorkoutPage = () => {
       return;
     }
     
-    // Erstelle den Trainingsplan - passing custom frequency (default will come from profile)
+    // Erstelle den Trainingsplan mit optimierten Trainingstagen
     const plan = createWorkoutPlan(bodyParts, userProfile);
     console.log("Created workout plan:", plan);
-    setWorkoutPlan(plan);
+    
+    // Optimierte Trainingstage nach Frequenz
+    const optimizedPlan = optimizeWorkoutDays(plan);
+    setWorkoutPlan(optimizedPlan);
     
     // Speichere den Plan im localStorage
-    localStorage.setItem("workoutPlan", JSON.stringify(plan));
+    localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
     
     toast({
       title: "Trainingsplan erstellt",
@@ -78,6 +88,67 @@ const WorkoutPage = () => {
     });
     
     setStep(2);
+  };
+
+  // Optimiert die Trainingstage nach Frequenz
+  const optimizeWorkoutDays = (plan: WorkoutPlan): WorkoutPlan => {
+    const frequency = plan.frequency;
+    const allDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+    
+    // Bestimme optimale Trainingstage basierend auf Frequenz
+    let optimalDays: string[] = [];
+    
+    switch(frequency) {
+      case 2:
+        optimalDays = ["Montag", "Donnerstag"];
+        break;
+      case 3:
+        optimalDays = ["Montag", "Mittwoch", "Freitag"];
+        break;
+      case 4:
+        optimalDays = ["Montag", "Dienstag", "Donnerstag", "Freitag"];
+        break;
+      case 5:
+        optimalDays = ["Montag", "Dienstag", "Mittwoch", "Freitag", "Samstag"];
+        break;
+      case 6:
+        optimalDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+        break;
+      default:
+        optimalDays = allDays.slice(0, frequency);
+    }
+    
+    // Erstelle neues Tagesschema mit optimierten Tagen
+    const newDays: { [key: string]: Exercise[] } = {};
+    
+    // Initialisiere alle Tage (auch Ruhetage)
+    allDays.forEach(day => {
+      newDays[day] = [];
+    });
+    
+    // Füge Übungen nur an optimalen Tagen ein
+    const oldDayNames = Object.keys(plan.days);
+    oldDayNames.sort(); // Sortiere, um konsistente Reihenfolge zu gewährleisten
+    
+    optimalDays.forEach((optimalDay, index) => {
+      if (index < oldDayNames.length) {
+        newDays[optimalDay] = plan.days[oldDayNames[index]];
+      }
+    });
+    
+    // Aktualisiere die Beschreibung
+    const updatedDescription = `Trainingsplan für ${
+      userProfile?.goal === "lose" ? "Gewichtsabnahme" : 
+      userProfile?.goal === "gain" ? "Muskelaufbau" : 
+      "Gewichtserhaltung"
+    } (${frequency}x pro Woche)`;
+    
+    // Erstelle aktualisierten Plan
+    return {
+      ...plan,
+      description: updatedDescription,
+      days: newDays
+    };
   };
 
   const handleReset = () => {

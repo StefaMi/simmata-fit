@@ -16,8 +16,38 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
   const [frequency, setFrequency] = useState<number>(workoutPlan.frequency);
   const dayNames = Object.keys(workoutPlan.days);
   
-  // Filter days based on selected frequency
-  const availableDays = dayNames.slice(0, frequency);
+  // Map of optimal training days based on frequency
+  const getOptimalTrainingDays = (freq: number): string[] => {
+    const allDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+    
+    switch(freq) {
+      case 2:
+        return ["Montag", "Donnerstag"];
+      case 3:
+        return ["Montag", "Mittwoch", "Freitag"];
+      case 4:
+        return ["Montag", "Dienstag", "Donnerstag", "Freitag"];
+      case 5:
+        return ["Montag", "Dienstag", "Mittwoch", "Freitag", "Samstag"];
+      case 6:
+        return ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+      default:
+        return allDays.slice(0, freq);
+    }
+  };
+  
+  // Get the optimal days for the current frequency
+  const optimizedDays = getOptimalTrainingDays(frequency);
+  
+  // Available days will be ordered according to the week
+  const weekdayOrder = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+  const availableDays = optimizedDays.sort((a, b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
+  
+  // Create a list of all days showing which ones are rest days
+  const allWeekDays = weekdayOrder.map(day => ({
+    name: day,
+    isRestDay: !availableDays.includes(day)
+  }));
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -53,43 +83,91 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
             Das Training wird automatisch auf {frequency} Tage verteilt.
           </p>
         </div>
+        
+        {/* Display the weekly schedule overview */}
+        <div className="mt-4">
+          <p className="text-sm font-medium mb-2">Wochenübersicht:</p>
+          <div className="flex flex-wrap gap-2">
+            {allWeekDays.map((day) => (
+              <span 
+                key={day.name}
+                className={`text-xs px-2 py-1 rounded-full ${
+                  day.isRestDay 
+                    ? "bg-slate-100 text-slate-500" 
+                    : "bg-fitness-primary/10 text-fitness-primary font-medium"
+                }`}
+              >
+                {day.name.substring(0, 2)}
+                {day.isRestDay ? " (Ruhetag)" : ""}
+              </span>
+            ))}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        {availableDays.length > 0 ? (
-          <Tabs defaultValue={availableDays[0]}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
-              {availableDays.map((day) => (
-                <TabsTrigger key={day} value={day}>
-                  {day}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
+        <Tabs defaultValue={availableDays.length > 0 ? availableDays[0] : "overview"}>
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
+            {/* Overview tab for complete summary */}
+            <TabsTrigger value="overview">Übersicht</TabsTrigger>
+            
+            {/* Individual day tabs */}
             {availableDays.map((day) => (
-              <TabsContent key={day} value={day}>
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold">{day} Training</h3>
-                  {workoutPlan.days[day].length === 0 ? (
-                    <p className="text-muted-foreground">Ruhetag</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {workoutPlan.days[day].map((exercise) => (
-                        <ExerciseCard key={exercise.id} exercise={exercise} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
+              <TabsTrigger key={day} value={day}>
+                {day}
+              </TabsTrigger>
             ))}
-          </Tabs>
-        ) : (
-          <div className="p-6 text-center">
-            <p className="text-muted-foreground">
-              Es konnten keine passenden Übungen für deine Auswahl gefunden werden.
-              Bitte wähle andere Körperteile aus.
-            </p>
-          </div>
-        )}
+          </TabsList>
+          
+          {/* Overview content showing all days */}
+          <TabsContent value="overview">
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold">Wochenplanung</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {allWeekDays.map((day) => (
+                  <Card key={day.name}>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-md">{day.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-2">
+                      {day.isRestDay ? (
+                        <p className="text-muted-foreground">Ruhetag</p>
+                      ) : (
+                        <ul className="list-disc pl-4 space-y-1">
+                          {workoutPlan.days[day.name]?.slice(0, 3).map((exercise) => (
+                            <li key={exercise.id} className="text-sm">{exercise.name}</li>
+                          ))}
+                          {workoutPlan.days[day.name]?.length > 3 && (
+                            <li className="text-sm text-muted-foreground">
+                              +{workoutPlan.days[day.name].length - 3} weitere
+                            </li>
+                          )}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Individual day content */}
+          {availableDays.map((day) => (
+            <TabsContent key={day} value={day}>
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold">{day} Training</h3>
+                {workoutPlan.days[day]?.length === 0 ? (
+                  <p className="text-muted-foreground">Ruhetag</p>
+                ) : (
+                  <div className="space-y-4">
+                    {workoutPlan.days[day]?.map((exercise) => (
+                      <ExerciseCard key={exercise.id} exercise={exercise} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">
