@@ -7,11 +7,11 @@ import Layout from "@/components/Layout";
 import { createWorkoutPlan } from "@/utils/calculators";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const WorkoutPage = () => {
   const { toast } = useToast();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<number>(1);
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -31,8 +31,9 @@ const WorkoutPage = () => {
     const savedWorkoutPlan = localStorage.getItem("workoutPlan");
     if (savedWorkoutPlan) {
       try {
-        setWorkoutPlan(JSON.parse(savedWorkoutPlan));
-        setStep(3); // Springe direkt zur Anzeige des Plans
+        const plan = JSON.parse(savedWorkoutPlan);
+        setWorkoutPlan(plan);
+        setStep(2); // Springe direkt zur Anzeige des Plans
       } catch (error) {
         console.error("Fehler beim Parsen des gespeicherten Trainingsplans:", error);
       }
@@ -41,6 +42,7 @@ const WorkoutPage = () => {
 
   // Handler für die Auswahl der Körperteile
   const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
+    console.log("Ausgewählte Körperteile:", bodyParts);
     setSelectedParts(bodyParts);
     
     if (!userProfile) {
@@ -54,6 +56,7 @@ const WorkoutPage = () => {
     
     // Erstelle den Trainingsplan
     const plan = createWorkoutPlan(bodyParts, userProfile);
+    console.log("Erstellter Trainingsplan:", plan);
     setWorkoutPlan(plan);
     
     // Speichere den Plan im localStorage
@@ -64,7 +67,7 @@ const WorkoutPage = () => {
       description: "Dein personalisierter Trainingsplan wurde erstellt.",
     });
     
-    setStep(3);
+    setStep(2);
   };
 
   const handleReset = () => {
@@ -98,7 +101,7 @@ const WorkoutPage = () => {
           <BodyPartSelector onSave={handleSaveBodyParts} initialSelection={selectedParts} />
         ) : null}
 
-        {step === 3 && workoutPlan ? (
+        {step === 2 && workoutPlan ? (
           <>
             <div className="flex justify-between items-center mb-6">
               <Button 
