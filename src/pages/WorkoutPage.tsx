@@ -9,22 +9,30 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
+// Define step types for better clarity
+type WorkoutStep = 1 | 2;
+
 const WorkoutPage = () => {
   const { toast } = useToast();
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<WorkoutStep>(1);
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>([]);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   // Lade das Nutzerprofil beim ersten Rendern
   useEffect(() => {
+    console.log("WorkoutPage mounting, loading profile and plan");
     const savedProfile = localStorage.getItem("userProfile");
     if (savedProfile) {
       try {
-        setUserProfile(JSON.parse(savedProfile));
+        const profile = JSON.parse(savedProfile);
+        console.log("Loaded user profile:", profile);
+        setUserProfile(profile);
       } catch (error) {
         console.error("Fehler beim Parsen des gespeicherten Profils:", error);
       }
+    } else {
+      console.log("No user profile found in localStorage");
     }
     
     // Lade den gespeicherten Trainingsplan
@@ -32,6 +40,7 @@ const WorkoutPage = () => {
     if (savedWorkoutPlan) {
       try {
         const plan = JSON.parse(savedWorkoutPlan);
+        console.log("Loaded saved workout plan:", plan);
         setWorkoutPlan(plan);
         setStep(2); // Springe direkt zur Anzeige des Plans
       } catch (error) {
@@ -42,10 +51,11 @@ const WorkoutPage = () => {
 
   // Handler für die Auswahl der Körperteile
   const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
-    console.log("Ausgewählte Körperteile:", bodyParts);
+    console.log("handleSaveBodyParts called with:", bodyParts);
     setSelectedParts(bodyParts);
     
     if (!userProfile) {
+      console.log("No user profile available, showing toast warning");
       toast({
         title: "Profil fehlt",
         description: "Bitte erstelle zuerst dein persönliches Profil.",
@@ -56,7 +66,7 @@ const WorkoutPage = () => {
     
     // Erstelle den Trainingsplan
     const plan = createWorkoutPlan(bodyParts, userProfile);
-    console.log("Erstellter Trainingsplan:", plan);
+    console.log("Created workout plan:", plan);
     setWorkoutPlan(plan);
     
     // Speichere den Plan im localStorage
@@ -71,11 +81,14 @@ const WorkoutPage = () => {
   };
 
   const handleReset = () => {
+    console.log("Resetting workout plan");
     setStep(1);
     setSelectedParts([]);
     setWorkoutPlan(null);
     localStorage.removeItem("workoutPlan");
   };
+
+  console.log("Current step:", step, "Workout plan exists:", !!workoutPlan);
 
   return (
     <Layout>

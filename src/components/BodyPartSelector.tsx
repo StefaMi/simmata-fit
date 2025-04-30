@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { BodyPart } from "@/types";
-import { Dumbbell, Heart, Scale, Timer, Activity, Weight } from "lucide-react";
+import { Dumbbell, Heart, Scale, Weight } from "lucide-react";
 
 type BodyPartSelectorProps = {
   onSave: (bodyParts: BodyPart[]) => void;
@@ -75,8 +75,11 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
                   <Checkbox
                     id={`bodypart-${option.value}`}
                     checked={selectedParts.includes(option.value)}
+                    // Here's the key fix: We were missing a proper onCheckedChange handler
                     onCheckedChange={() => handleToggle(option.value)}
                     className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
+                    // Don't allow the checkbox to handle its own click event
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </div>
               </div>
