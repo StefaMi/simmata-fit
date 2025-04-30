@@ -79,32 +79,58 @@ export const calculateMacros = (profile: UserProfile): { protein: number, carbs:
 // Erstellt einen Trainingsplan basierend auf den gewählten Körperteilen
 export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): WorkoutPlan => {
   const workoutFrequency = determineWorkoutFrequency(profile);
-  const exercises: Exercise[] = [];
+  const allExercises: Exercise[] = [];
   
   // Übungen für jedes gewählte Körperteil sammeln
   bodyParts.forEach(bodyPart => {
     const bodyPartExercises = getExercisesByBodyPart(bodyPart);
-    exercises.push(...bodyPartExercises.slice(0, 2)); // Nimm bis zu 2 Übungen pro Körperteil
+    // Nehme alle verfügbaren Übungen für diesen Körperteil
+    allExercises.push(...bodyPartExercises);
   });
+
+  // Aktualisiere die Video-URLs für alle Übungen
+  const exercisesWithUpdatedVideos = allExercises.map(exercise => ({
+    ...exercise,
+    videoUrl: `https://www.youtube.com/@workoutendomondo/shorts`
+  }));
   
   // Trainingstage erstellen
   const days: { [key: string]: Exercise[] } = {};
   const daysOfWeek = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
   
-  // Verteile die Übungen auf die Trainingstage
+  // Berechne die Mindestanzahl von Übungen pro Tag (mindestens 3-5)
+  const totalExercises = exercisesWithUpdatedVideos.length;
+  const minExercisesPerDay = Math.max(3, Math.min(5, Math.ceil(totalExercises / workoutFrequency)));
+  
+  // Verteile die Übungen gleichmäßig auf die Trainingstage
+  // Wir verwenden nur so viele Tage wie in workoutFrequency definiert
   for (let i = 0; i < workoutFrequency; i++) {
     const dayExercises: Exercise[] = [];
-    const exercisesPerDay = Math.ceil(exercises.length / workoutFrequency);
-    const startIndex = i * exercisesPerDay;
-    const endIndex = Math.min((i + 1) * exercisesPerDay, exercises.length);
+    const dayIndex = i % daysOfWeek.length;
     
+    // Bestimme den Bereich der Übungen für diesen Tag
+    const exercisesPerDay = Math.ceil(totalExercises / workoutFrequency);
+    const startIndex = i * exercisesPerDay;
+    let endIndex = Math.min((i + 1) * exercisesPerDay, totalExercises);
+    
+    // Stelle sicher, dass wir mindestens minExercisesPerDay Übungen haben
+    if (endIndex - startIndex < minExercisesPerDay && startIndex < totalExercises) {
+      // Wenn nicht genug Übungen für diesen Tag, nehmen wir was verfügbar ist
+      endIndex = Math.min(startIndex + minExercisesPerDay, totalExercises);
+    }
+    
+    // Füge die Übungen für diesen Tag hinzu
     for (let j = startIndex; j < endIndex; j++) {
-      if (exercises[j]) {
-        dayExercises.push(exercises[j]);
+      if (j < exercisesWithUpdatedVideos.length) {
+        dayExercises.push(exercisesWithUpdatedVideos[j]);
       }
     }
     
-    days[daysOfWeek[i]] = dayExercises;
+    // Wenn wir keine Übungen mehr haben oder alle verteilt haben, beende die Schleife
+    if (dayExercises.length === 0) break;
+    
+    // Füge den Tag zum Trainingsplan hinzu
+    days[daysOfWeek[dayIndex]] = dayExercises;
   }
   
   return {
@@ -112,7 +138,7 @@ export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): 
     name: "Personalisierter Trainingsplan",
     description: `Trainingsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"}`,
     frequency: workoutFrequency,
-    exercises: exercises,
+    exercises: exercisesWithUpdatedVideos,
     days: days
   };
 };

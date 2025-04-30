@@ -23,6 +23,26 @@ export const exercises: Exercise[] = [
     reps: 12,
     restTime: 60
   },
+  {
+    id: "ex2b",
+    name: "Schrägbankdrücken",
+    bodyPart: "chest",
+    description: "Brustübung mit Fokus auf den oberen Brustbereich.",
+    videoUrl: "https://www.youtube.com/watch?v=jPLdzuHckI8",
+    sets: 3,
+    reps: 10,
+    restTime: 60
+  },
+  {
+    id: "ex2c",
+    name: "Kabelzug-Fliegende",
+    bodyPart: "chest",
+    description: "Isolationsübung für die Brustmuskulatur am Kabelzug.",
+    videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o",
+    sets: 3,
+    reps: 15,
+    restTime: 60
+  },
   // Rücken
   {
     id: "ex3",
@@ -44,6 +64,26 @@ export const exercises: Exercise[] = [
     reps: 10,
     restTime: 90
   },
+  {
+    id: "ex4b",
+    name: "Latziehen",
+    bodyPart: "back",
+    description: "Übung für den breiten Rückenmuskel (Latissimus) am Kabelzug.",
+    videoUrl: "https://www.youtube.com/watch?v=CAwf7n6Luuc",
+    sets: 3,
+    reps: 12,
+    restTime: 75
+  },
+  {
+    id: "ex4c",
+    name: "Einarmiges Rudern",
+    bodyPart: "back",
+    description: "Einseitige Rückenübung mit Kurzhantel.",
+    videoUrl: "https://www.youtube.com/watch?v=pYcpY20QaE8",
+    sets: 3,
+    reps: 10,
+    restTime: 60
+  },
   // Schultern
   {
     id: "ex5",
@@ -63,6 +103,26 @@ export const exercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=3VcKaXpzqRo",
     sets: 3,
     reps: 15,
+    restTime: 60
+  },
+  {
+    id: "ex6b",
+    name: "Vorgebeugtes Seitheben",
+    bodyPart: "shoulders",
+    description: "Isolationsübung für den hinteren Deltamuskel.",
+    videoUrl: "https://www.youtube.com/watch?v=ttvfGg9d76c",
+    sets: 3,
+    reps: 15,
+    restTime: 60
+  },
+  {
+    id: "ex6c",
+    name: "Frontheben",
+    bodyPart: "shoulders",
+    description: "Isolationsübung für den vorderen Deltamuskel.",
+    videoUrl: "https://www.youtube.com/watch?v=sxeMWa7ZQNc",
+    sets: 3,
+    reps: 12,
     restTime: 60
   },
   // Bizeps
@@ -86,6 +146,26 @@ export const exercises: Exercise[] = [
     reps: 12,
     restTime: 60
   },
+  {
+    id: "ex8b",
+    name: "Konzentrationscurls",
+    bodyPart: "biceps",
+    description: "Isolationsübung für den Bizeps im Sitzen.",
+    videoUrl: "https://www.youtube.com/watch?v=Jvj2wV0vOYU",
+    sets: 3,
+    reps: 12,
+    restTime: 60
+  },
+  {
+    id: "ex8c",
+    name: "Kabelzug Curls",
+    bodyPart: "biceps",
+    description: "Bizepsübung am Kabelzug mit konstantem Widerstand.",
+    videoUrl: "https://www.youtube.com/watch?v=3qUJMeZgArY",
+    sets: 3,
+    reps: 15,
+    restTime: 60
+  },
   // Trizeps
   {
     id: "ex9",
@@ -105,6 +185,26 @@ export const exercises: Exercise[] = [
     videoUrl: "https://www.youtube.com/watch?v=2z8JmcrW-As",
     sets: 3,
     reps: 10,
+    restTime: 60
+  },
+  {
+    id: "ex10b",
+    name: "Trizeps Kickbacks",
+    bodyPart: "triceps",
+    description: "Isolationsübung für den Trizeps mit Kurzhantel.",
+    videoUrl: "https://www.youtube.com/watch?v=m9me06UBPKc",
+    sets: 3,
+    reps: 15,
+    restTime: 60
+  },
+  {
+    id: "ex10c",
+    name: "Liegende Trizepsstreckung",
+    bodyPart: "triceps",
+    description: "Isolationsübung für den Trizeps im Liegen mit Kurzhantel oder Langhantel.",
+    videoUrl: "https://www.youtube.com/watch?v=d_KZxkY_0cM",
+    sets: 3,
+    reps: 12,
     restTime: 60
   },
   // Beine
@@ -128,6 +228,36 @@ export const exercises: Exercise[] = [
     reps: 12,
     restTime: 90
   },
+  {
+    id: "ex12b",
+    name: "Beinstrecker",
+    bodyPart: "legs",
+    description: "Isolationsübung für den vorderen Oberschenkel (Quadrizeps).",
+    videoUrl: "https://www.youtube.com/watch?v=YyvSfVjQeL0",
+    sets: 3,
+    reps: 15,
+    restTime: 60
+  },
+  {
+    id: "ex12c",
+    name: "Beinbeuger",
+    bodyPart: "legs",
+    description: "Isolationsübung für den hinteren Oberschenkel (Hamstrings).",
+    videoUrl: "https://www.youtube.com/watch?v=1Tq3QdYUuHs",
+    sets: 3,
+    reps: 12,
+    restTime: 60
+  },
+  {
+    id: "ex12d",
+    name: "Ausfallschritte",
+    bodyPart: "legs",
+    description: "Dynamische Übung für Beine und Gesäß.",
+    videoUrl: "https://www.youtube.com/watch?v=D7KaRcUTQeE",
+    sets: 3,
+    reps: 12,
+    restTime: 60
+  },
   // Bauchmuskeln
   {
     id: "ex13",
@@ -149,6 +279,26 @@ export const exercises: Exercise[] = [
     reps: 15,
     restTime: 45
   },
+  {
+    id: "ex14b",
+    name: "Russian Twists",
+    bodyPart: "abs",
+    description: "Übung für die seitlichen Bauchmuskeln (Obliques).",
+    videoUrl: "https://www.youtube.com/watch?v=wkD8rjkodUI",
+    sets: 3,
+    reps: 20,
+    restTime: 45
+  },
+  {
+    id: "ex14c",
+    name: "Planke",
+    bodyPart: "abs",
+    description: "Statische Übung für die Körpermitte.",
+    videoUrl: "https://www.youtube.com/watch?v=ASdvN_XEl_c",
+    sets: 3,
+    reps: 1,
+    restTime: 60
+  },
   // Kardio
   {
     id: "ex15",
@@ -169,6 +319,26 @@ export const exercises: Exercise[] = [
     sets: 1,
     reps: 1,
     restTime: 0
+  },
+  {
+    id: "ex16b",
+    name: "Seilspringen",
+    bodyPart: "cardio",
+    description: "Effektives Kardiotraining mit Springseil.",
+    videoUrl: "https://www.youtube.com/watch?v=u3zgHI8QnqE",
+    sets: 1,
+    reps: 1,
+    restTime: 0
+  },
+  {
+    id: "ex16c",
+    name: "Burpees",
+    bodyPart: "cardio",
+    description: "Ganzkörperübung für Kraft und Ausdauer.",
+    videoUrl: "https://www.youtube.com/watch?v=TU8QYVW0gDU",
+    sets: 3,
+    reps: 15,
+    restTime: 45
   }
 ];
 
