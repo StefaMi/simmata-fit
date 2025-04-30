@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import BodyPartSelector from "@/components/BodyPartSelector";
 import WorkoutPlanDisplay from "@/components/WorkoutPlanDisplay";
-import { BodyPart, UserProfile, WorkoutPlan } from "@/types";
+import { BodyPart, UserProfile, WorkoutPlan, Exercise } from "@/types";
 import Layout from "@/components/Layout";
 import { createWorkoutPlan } from "@/utils/calculators";
 import { useToast } from "@/components/ui/use-toast";
@@ -132,7 +132,7 @@ const WorkoutPage = () => {
     
     optimalDays.forEach((optimalDay, index) => {
       if (index < oldDayNames.length) {
-        newDays[optimalDay] = plan.days[oldDayNames[index]];
+        newDays[optimalDay] = [...plan.days[oldDayNames[index]]];
       }
     });
     
