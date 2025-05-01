@@ -26,7 +26,7 @@ const Layout = ({ children }: Props) => {
       <header className="bg-white shadow">
         <div className="container mx-auto py-4 px-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-2xl font-bold text-fitness-primary">FitnessApp</Link>
+            <Link to="/" className="text-2xl font-bold text-fitness-primary">Simmata Fit</Link>
           </div>
         </div>
       </header>
