@@ -51,7 +51,7 @@ const VerifyEmailPage = () => {
   return (
     <Layout hideNav>
       <div className="container max-w-md py-8 px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Simmata Fit</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">Rush</h1>
         <Card className="w-full max-w-md mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl text-center">
