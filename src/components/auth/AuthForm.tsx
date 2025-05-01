@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -17,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Ungültige Email-Adresse." }),
@@ -40,8 +42,10 @@ type AuthFormProps = {
 const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login, register } = useAuth();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -63,11 +67,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const handleLoginSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: Will be implemented with Supabase
-      console.log("Login attempt:", data);
-      
-      // For now, mock a successful login
-      localStorage.setItem("authUser", JSON.stringify({ email: data.email }));
+      await login(data.email, data.password);
       
       toast({
         title: "Erfolgreich angemeldet",
@@ -75,7 +75,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
       });
       
       if (onSuccess) onSuccess();
-      navigate("/");
+      navigate("/profile");
     } catch (error) {
       toast({
         title: "Fehler bei der Anmeldung",
@@ -90,19 +90,19 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const handleRegisterSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // TODO: Will be implemented with Supabase
-      console.log("Registration attempt:", data);
+      // For now, we'll simulate sending a verification email
+      // This would be handled by Supabase in a real implementation
       
-      // For now, mock a successful registration
-      localStorage.setItem("authUser", JSON.stringify({ email: data.email }));
+      // Mock registration - this would be replaced by actual Supabase registration
+      await register(data.email, data.password);
+      
+      setEmailSent(data.email);
       
       toast({
         title: "Registrierung erfolgreich",
-        description: "Willkommen bei Simmata Fit!",
+        description: "Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu verifizieren.",
       });
       
-      if (onSuccess) onSuccess();
-      navigate("/");
     } catch (error) {
       toast({
         title: "Fehler bei der Registrierung",
@@ -117,6 +117,37 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const handleResetPassword = () => {
     navigate("/reset-password");
   };
+
+  // If verification email has been sent, show verification instructions
+  if (emailSent) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">
+            E-Mail Verifizierung
+          </CardTitle>
+          <CardDescription className="text-center">
+            Wir haben eine Bestätigungs-E-Mail an {emailSent} gesendet
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-center">
+          <p className="mb-4">Bitte überprüfen Sie Ihren Posteingang und klicken Sie auf den Bestätigungslink, um Ihre E-Mail-Adresse zu verifizieren.</p>
+          <p className="text-sm text-muted-foreground">Wenn Sie keine E-Mail erhalten haben, überprüfen Sie bitte Ihren Spam-Ordner.</p>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button 
+            variant="link" 
+            onClick={() => {
+              setEmailSent(null);
+              setIsLogin(true);
+            }}
+          >
+            Zurück zur Anmeldung
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   const renderSocialButtons = () => (
     <div className="grid grid-cols-3 gap-2 mt-2">

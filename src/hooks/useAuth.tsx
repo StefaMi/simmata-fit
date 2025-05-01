@@ -5,6 +5,7 @@ type User = {
   email: string;
   id?: string;
   name?: string;
+  isVerified?: boolean;
 } | null;
 
 type AuthContextType = {
@@ -14,6 +15,7 @@ type AuthContextType = {
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  verifyEmail: (token: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // TODO: Will be replaced with actual Supabase auth
       // Mock login for now
-      const mockUser = { email };
+      const mockUser = { email, isVerified: true };
       localStorage.setItem("authUser", JSON.stringify(mockUser));
       setUser(mockUser);
     } catch (error) {
@@ -61,12 +63,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       // TODO: Will be replaced with actual Supabase auth
-      // Mock registration for now
-      const mockUser = { email };
-      localStorage.setItem("authUser", JSON.stringify(mockUser));
-      setUser(mockUser);
+      // Mock registration for now - note we're not setting the user
+      // because they need to verify their email first
+      
+      // In a real implementation with Supabase, this would send a verification email
+      console.log("Email verification would be sent to:", email);
+      
+      // Store in localStorage for demo purposes that this user started registration
+      localStorage.setItem("pendingVerification", email);
+      
+      // We don't set the user here since they need to verify first
+      
     } catch (error) {
       console.error("Registration error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyEmail = async (token: string) => {
+    setIsLoading(true);
+    try {
+      // TODO: Will be replaced with actual Supabase auth
+      // Mock email verification for now
+      const pendingEmail = localStorage.getItem("pendingVerification");
+      
+      if (pendingEmail) {
+        // In a real implementation, we would verify the token with Supabase
+        
+        // Create the verified user
+        const mockUser = { email: pendingEmail, isVerified: true };
+        localStorage.setItem("authUser", JSON.stringify(mockUser));
+        localStorage.removeItem("pendingVerification");
+        setUser(mockUser);
+      }
+    } catch (error) {
+      console.error("Email verification error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -106,7 +139,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
-    resetPassword
+    resetPassword,
+    verifyEmail
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
