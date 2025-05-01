@@ -61,7 +61,10 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
                 onClick={() => handleToggle(option.value)}
               >
                 <div className="flex flex-col items-center space-y-2">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10">
+                  <div 
+                    className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10"
+                    // Wir entfernen den onClick hier, da er bereits auf dem umgebenden Container ist
+                  >
                     {option.icon}
                   </div>
                   <div className="text-center">
@@ -75,11 +78,13 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
                   <Checkbox
                     id={`bodypart-${option.value}`}
                     checked={selectedParts.includes(option.value)}
-                    // Here's the key fix: We were missing a proper onCheckedChange handler
                     onCheckedChange={() => handleToggle(option.value)}
                     className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
-                    // Don't allow the checkbox to handle its own click event
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      // Verhindern Sie, dass das Click-Event zum umgebenden Container propagiert wird
+                      // Dies verhindert doppelte Toggle-Aktionen
+                      e.stopPropagation();
+                    }}
                   />
                 </div>
               </div>
