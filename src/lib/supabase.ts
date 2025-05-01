@@ -12,11 +12,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Create the Supabase client even with empty credentials
-// This avoids runtime errors but authentication functions won't work
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+// Create a dummy client if credentials are missing
+const supabaseClient = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : {
+      auth: {
+        signInWithPassword: () => Promise.resolve({ error: new Error("Supabase not configured") }),
+        signUp: () => Promise.resolve({ error: new Error("Supabase not configured") }),
+        signOut: () => Promise.resolve({ error: new Error("Supabase not configured") }),
+        getSession: () => Promise.resolve({ data: { session: null } }),
+        resetPasswordForEmail: () => Promise.resolve({ error: new Error("Supabase not configured") }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      }
+    };
 
-// Export a helper function to check if Supabase is properly configured
+// Export the client and a helper function to check if Supabase is properly configured
+export { supabaseClient };
 export const isSupabaseConfigured = () => {
   return !!supabaseUrl && !!supabaseAnonKey;
 };
