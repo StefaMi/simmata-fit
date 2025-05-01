@@ -15,7 +15,7 @@ type AuthContextType = {
   user: AuthUser;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
@@ -112,19 +112,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (email: string, password: string) => {
     if (!isSupabaseReady) {
-      throw new Error("Supabase is not configured");
+      throw new Error("Supabase ist nicht konfiguriert");
     }
     
     setIsLoading(true);
     try {
-      const { error } = await supabaseClient.auth.signUp({
+      // Log the registration attempt for debugging
+      console.log("Attempting to register user with email:", email);
+      
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/verify-email`,
         },
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Supabase registration error:", error);
+        throw error;
+      }
+      
+      console.log("Registration response:", data);
+      
+      // Check if user is already registered
+      if (data?.user?.identities?.length === 0) {
+        throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
+      }
+      
+      return data;
     } catch (error) {
       console.error("Registration error:", error);
       throw error;

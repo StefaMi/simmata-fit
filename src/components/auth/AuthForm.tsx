@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -46,6 +45,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login, register, isSupabaseReady } = useAuth();
@@ -78,6 +78,8 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
     }
     
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
       await login(data.email, data.password);
       
@@ -88,7 +90,9 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
       
       if (onSuccess) onSuccess();
       navigate("/profile");
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setErrorMessage(error?.message || "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.");
       toast({
         title: "Fehler bei der Anmeldung",
         description: "Bitte überprüfen Sie Ihre Eingaben.",
@@ -110,9 +114,14 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
     }
     
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
-      await register(data.email, data.password);
+      console.log("Starting registration with:", data.email);
+      const result = await register(data.email, data.password);
+      console.log("Registration result:", result);
       
+      // Since registration was successful, show success message
       setEmailSent(data.email);
       
       toast({
@@ -120,11 +129,12 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
         description: "Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu verifizieren.",
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
+      setErrorMessage(error?.message || "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.");
       toast({
         title: "Fehler bei der Registrierung",
-        description: "Bitte überprüfen Sie Ihre Eingaben.",
+        description: error?.message || "Bitte überprüfen Sie Ihre Eingaben.",
         variant: "destructive",
       });
     } finally {
@@ -180,6 +190,14 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
           </Alert>
         </CardHeader>
       )}
+      {errorMessage && (
+        <CardHeader className="pb-0">
+          <Alert variant="destructive">
+            <AlertTitle>Fehler</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        </CardHeader>
+      )}
       <CardHeader>
         <CardTitle className="text-2xl text-center">
           {isLogin ? "Anmelden" : "Registrieren"}
@@ -203,6 +221,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input 
+                        type="email"
                         placeholder="name@beispiel.de" 
                         {...field} 
                         disabled={isLoading || !isSupabaseReady}
@@ -256,9 +275,9 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input 
+                        type="email"
                         placeholder="name@beispiel.de" 
                         {...field} 
-                        type="email"
                         disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
@@ -302,7 +321,11 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading || !isSupabaseReady}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading || !isSupabaseReady}
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 Registrieren
               </Button>
