@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Apple, Facebook, Google, Mail } from "lucide-react";
+import { Apple, Facebook, Mail } from "lucide-react";
 
 import {
   Form,
@@ -127,12 +126,12 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
         disabled={isLoading}
         onClick={() => {
           toast({
-            description: "Google-Anmeldung wird vorbereitet...",
+            description: "Apple-Anmeldung wird vorbereitet...",
           });
         }}
       >
-        <Google className="mr-2 h-4 w-4" />
-        Google
+        <Apple className="mr-2 h-4 w-4" />
+        Apple
       </Button>
       <Button 
         variant="outline" 
@@ -153,12 +152,12 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
         disabled={isLoading}
         onClick={() => {
           toast({
-            description: "Apple-Anmeldung wird vorbereitet...",
+            description: "Mail-Anmeldung wird vorbereitet...",
           });
         }}
       >
-        <Apple className="mr-2 h-4 w-4" />
-        Apple
+        <Mail className="mr-2 h-4 w-4" />
+        Mail
       </Button>
     </div>
   );
