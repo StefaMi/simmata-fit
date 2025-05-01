@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { FocusExercise } from "@/types";
 import { Wind, Activity } from "lucide-react";
 
@@ -50,7 +51,7 @@ const ExerciseTimer = ({ exercise, onComplete, onCancel }: ExerciseTimerProps) =
   const [timeLeft, setTimeLeft] = useState(exercise.duration);
   const [isPaused, setIsPaused] = useState(false);
   
-  useState(() => {
+  useEffect(() => {
     const timer = !isPaused 
       ? setInterval(() => {
           setTimeLeft(prevTime => {
@@ -140,7 +141,7 @@ const FocusExercises = () => {
                           <p className="text-sm text-muted-foreground">{exercise.description}</p>
                         </div>
                         {exercise.type === "nesma" && (
-                          <Badge className="bg-fitness-primary">Nesma</Badge>
+                          <Badge variant="default" className="bg-fitness-primary">Nesma</Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
