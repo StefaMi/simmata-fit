@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -16,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -44,7 +46,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [emailSent, setEmailSent] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, register } = useAuth();
+  const { login, register, isSupabaseReady } = useAuth();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -64,6 +66,15 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   });
 
   const handleLoginSubmit = async (data: LoginFormValues) => {
+    if (!isSupabaseReady) {
+      toast({
+        title: "Supabase nicht konfiguriert",
+        description: "Bitte konfigurieren Sie Supabase für die Authentifizierung.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     try {
       await login(data.email, data.password);
@@ -87,6 +98,15 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   };
 
   const handleRegisterSubmit = async (data: RegisterFormValues) => {
+    if (!isSupabaseReady) {
+      toast({
+        title: "Supabase nicht konfiguriert",
+        description: "Bitte konfigurieren Sie Supabase für die Authentifizierung.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     try {
       await register(data.email, data.password);
@@ -144,52 +164,19 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
     );
   }
 
-  const renderSocialButtons = () => (
-    <div className="grid grid-cols-3 gap-2 mt-2">
-      <Button 
-        variant="outline" 
-        className="w-full" 
-        disabled={isLoading}
-        onClick={() => {
-          toast({
-            description: "Apple-Anmeldung wird vorbereitet...",
-          });
-        }}
-      >
-        <Apple className="mr-2 h-4 w-4" />
-        Apple
-      </Button>
-      <Button 
-        variant="outline" 
-        className="w-full" 
-        disabled={isLoading}
-        onClick={() => {
-          toast({
-            description: "Facebook-Anmeldung wird vorbereitet...",
-          });
-        }}
-      >
-        <Facebook className="mr-2 h-4 w-4" />
-        Facebook
-      </Button>
-      <Button 
-        variant="outline" 
-        className="w-full" 
-        disabled={isLoading}
-        onClick={() => {
-          toast({
-            description: "Mail-Anmeldung wird vorbereitet...",
-          });
-        }}
-      >
-        <Mail className="mr-2 h-4 w-4" />
-        Mail
-      </Button>
-    </div>
-  );
-
   return (
     <Card className="w-full max-w-md mx-auto">
+      {!isSupabaseReady && (
+        <CardHeader className="pb-0">
+          <Alert variant="destructive">
+            <AlertTitle>Supabase nicht konfiguriert</AlertTitle>
+            <AlertDescription>
+              Die Authentifizierungsfunktionen sind nicht verfügbar, da Supabase nicht konfiguriert ist. 
+              Bitte stellen Sie sicher, dass die VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY Umgebungsvariablen gesetzt sind.
+            </AlertDescription>
+          </Alert>
+        </CardHeader>
+      )}
       <CardHeader>
         <CardTitle className="text-2xl text-center">
           {isLogin ? "Anmelden" : "Registrieren"}
@@ -215,7 +202,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                       <Input 
                         placeholder="name@beispiel.de" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
                     <FormMessage />
@@ -233,7 +220,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                         type="password" 
                         placeholder="******" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
                     <FormMessage />
@@ -245,11 +232,11 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                 variant="link" 
                 className="p-0 h-auto font-normal text-sm"
                 onClick={handleResetPassword}
-                disabled={isLoading}
+                disabled={isLoading || !isSupabaseReady}
               >
                 Passwort vergessen?
               </Button>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !isSupabaseReady}>
                 <Mail className="mr-2 h-4 w-4" />
                 Anmelden
               </Button>
@@ -268,7 +255,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                       <Input 
                         placeholder="name@beispiel.de" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
                     <FormMessage />
@@ -286,7 +273,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                         type="password" 
                         placeholder="******" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
                     <FormMessage />
@@ -304,14 +291,14 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                         type="password" 
                         placeholder="******" 
                         {...field} 
-                        disabled={isLoading}
+                        disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !isSupabaseReady}>
                 <Mail className="mr-2 h-4 w-4" />
                 Registrieren
               </Button>
@@ -330,14 +317,54 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
           </div>
         </div>
         
-        {renderSocialButtons()}
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            disabled={isLoading || !isSupabaseReady}
+            onClick={() => {
+              toast({
+                description: "Apple-Anmeldung wird vorbereitet...",
+              });
+            }}
+          >
+            <Apple className="mr-2 h-4 w-4" />
+            Apple
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            disabled={isLoading || !isSupabaseReady}
+            onClick={() => {
+              toast({
+                description: "Facebook-Anmeldung wird vorbereitet...",
+              });
+            }}
+          >
+            <Facebook className="mr-2 h-4 w-4" />
+            Facebook
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            disabled={isLoading || !isSupabaseReady}
+            onClick={() => {
+              toast({
+                description: "Mail-Anmeldung wird vorbereitet...",
+              });
+            }}
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            Mail
+          </Button>
+        </div>
       </CardContent>
       <CardFooter>
         <Button 
           variant="link" 
           className="w-full" 
           onClick={() => setIsLogin(!isLogin)}
-          disabled={isLoading}
+          disabled={isLoading || !isSupabaseReady}
         >
           {isLogin 
             ? "Noch kein Konto? Registrieren" 

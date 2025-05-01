@@ -1,7 +1,8 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-import { supabaseClient } from "@/lib/supabase";
+import { supabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 import { AuthError, Session, User } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 type AuthUser = {
   email: string;
@@ -18,6 +19,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
+  isSupabaseReady: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,9 +27,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isSupabaseReady = isSupabaseConfigured();
+  const { toast } = useToast();
+  
+  // Show warning toast if Supabase is not configured
+  useEffect(() => {
+    if (!isSupabaseReady) {
+      toast({
+        title: "Supabase not configured",
+        description: "Authentication features won't work without Supabase credentials",
+        variant: "destructive",
+      });
+    }
+  }, [isSupabaseReady, toast]);
 
   // Update user state when auth state changes
   useEffect(() => {
+    if (!isSupabaseReady) {
+      setIsLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       (_event, session) => {
         setIsLoading(true);
@@ -68,9 +88,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [isSupabaseReady, toast]);
 
   const login = async (email: string, password: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase is not configured");
+    }
+    
     setIsLoading(true);
     try {
       const { error } = await supabaseClient.auth.signInWithPassword({
@@ -87,6 +111,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (email: string, password: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase is not configured");
+    }
+    
     setIsLoading(true);
     try {
       const { error } = await supabaseClient.auth.signUp({
@@ -106,6 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const verifyEmail = async (token: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase is not configured");
+    }
+    
     // With Supabase, email verification is handled automatically
     // This function remains for API consistency but won't do anything
     console.log("Email verification token:", token);
@@ -113,6 +145,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase is not configured");
+    }
+    
     setIsLoading(true);
     try {
       const { error } = await supabaseClient.auth.signOut();
@@ -126,6 +162,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase is not configured");
+    }
+    
     setIsLoading(true);
     try {
       const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
@@ -147,7 +187,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     resetPassword,
-    verifyEmail
+    verifyEmail,
+    isSupabaseReady
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
