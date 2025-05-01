@@ -1,33 +1,14 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables or use empty strings as fallbacks
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Set Supabase URL and anonymous key
+const supabaseUrl = 'https://yaeiycpyyjlpalyzfhiw.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhZWl5Y3B5eWpscGFseXpmaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMzAwODYsImV4cCI6MjA2MTcwNjA4Nn0.3uVlphNhpJrvJJVrshS4EzlAOxdnCrVvB4aoiNq3V7o';
 
-// Check if Supabase credentials are available
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error(
-    "Missing Supabase credentials. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment variables."
-  );
-}
+// Create the Supabase client
+export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
-// Create a dummy client if credentials are missing
-const supabaseClient = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : {
-      auth: {
-        signInWithPassword: () => Promise.resolve({ error: new Error("Supabase not configured") }),
-        signUp: () => Promise.resolve({ error: new Error("Supabase not configured") }),
-        signOut: () => Promise.resolve({ error: new Error("Supabase not configured") }),
-        getSession: () => Promise.resolve({ data: { session: null } }),
-        resetPasswordForEmail: () => Promise.resolve({ error: new Error("Supabase not configured") }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-      }
-    };
-
-// Export the client and a helper function to check if Supabase is properly configured
-export { supabaseClient };
+// Export a helper function to check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
-  return !!supabaseUrl && !!supabaseAnonKey;
+  return true; // Since we're now using hardcoded credentials, Supabase is always configured
 };
