@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const passwordResetSchema = z.object({
   email: z.string().email({ message: "Ungültige Email-Adresse." }),
@@ -28,6 +29,7 @@ const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { resetPassword } = useAuth();
   
   const form = useForm<PasswordResetValues>({
     resolver: zodResolver(passwordResetSchema),
@@ -39,8 +41,7 @@ const PasswordResetForm = () => {
   const onSubmit = async (data: PasswordResetValues) => {
     setIsLoading(true);
     try {
-      // TODO: Will be implemented with Supabase
-      console.log("Password reset requested for:", data.email);
+      await resetPassword(data.email);
       
       toast({
         title: "Link gesendet",

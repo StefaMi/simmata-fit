@@ -1,62 +1,52 @@
 
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { supabaseClient } from "@/lib/supabase";
 
 const VerifyEmailPage = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
-  const { verifyEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isVerifying, setIsVerifying] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<"pending" | "success" | "error">("pending");
 
   useEffect(() => {
-    const verify = async () => {
-      if (!token) {
-        setVerificationStatus("error");
-        toast({
-          title: "Verifizierung fehlgeschlagen",
-          description: "Kein Verifizierungstoken gefunden.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setIsVerifying(true);
+    const handleEmailConfirmation = async () => {
       try {
-        // In a real implementation, this would verify the token with Supabase
-        await verifyEmail(token);
-        setVerificationStatus("success");
-        toast({
-          title: "E-Mail verifiziert",
-          description: "Ihre E-Mail wurde erfolgreich bestätigt.",
-        });
+        // Check if user is already signed in after email confirmation
+        const { data: { session } } = await supabaseClient.auth.getSession();
         
-        // Wait a moment before redirecting
-        setTimeout(() => {
-          navigate("/profile");
-        }, 2000);
+        if (session?.user) {
+          // User is signed in and email is confirmed
+          setVerificationStatus("success");
+          toast({
+            title: "E-Mail verifiziert",
+            description: "Ihre E-Mail wurde erfolgreich bestätigt.",
+          });
+          
+          // Wait a moment before redirecting
+          setTimeout(() => {
+            navigate("/profile");
+          }, 2000);
+        } else {
+          // User is not signed in yet, or email is not confirmed
+          setVerificationStatus("pending");
+        }
       } catch (error) {
-        console.error("Verification error:", error);
+        console.error("Verification check error:", error);
         setVerificationStatus("error");
         toast({
           title: "Verifizierung fehlgeschlagen",
           description: "Bitte versuchen Sie es erneut oder fordern Sie einen neuen Verifizierungslink an.",
           variant: "destructive",
         });
-      } finally {
-        setIsVerifying(false);
       }
     };
 
-    verify();
-  }, [token, verifyEmail, toast, navigate]);
+    handleEmailConfirmation();
+  }, [toast, navigate]);
 
   return (
     <Layout hideNav>

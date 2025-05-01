@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -90,10 +89,6 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const handleRegisterSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // For now, we'll simulate sending a verification email
-      // This would be handled by Supabase in a real implementation
-      
-      // Mock registration - this would be replaced by actual Supabase registration
       await register(data.email, data.password);
       
       setEmailSent(data.email);

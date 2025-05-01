@@ -1,15 +1,17 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+import { supabaseClient } from "@/lib/supabase";
+import { AuthError, Session, User } from "@supabase/supabase-js";
 
-type User = {
+type AuthUser = {
   email: string;
-  id?: string;
+  id: string;
   name?: string;
   isVerified?: boolean;
 } | null;
 
 type AuthContextType = {
-  user: User;
+  user: AuthUser;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
@@ -21,36 +23,61 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<AuthUser>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Update user state when auth state changes
   useEffect(() => {
-    // Check for existing user in localStorage
-    const checkAuth = async () => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoading(true);
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            isVerified: session.user.email_confirmed_at ? true : false,
+          });
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
+      }
+    );
+
+    // Get initial session
+    const initializeAuth = async () => {
+      setIsLoading(true);
       try {
-        const authUserJSON = localStorage.getItem("authUser");
-        if (authUserJSON) {
-          const authUser = JSON.parse(authUserJSON);
-          setUser(authUser);
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            isVerified: session.user.email_confirmed_at ? true : false,
+          });
         }
       } catch (error) {
-        console.error("Error checking authentication:", error);
+        console.error("Error checking auth status:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // TODO: Will be replaced with actual Supabase auth
-      // Mock login for now
-      const mockUser = { email, isVerified: true };
-      localStorage.setItem("authUser", JSON.stringify(mockUser));
-      setUser(mockUser);
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -62,18 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // TODO: Will be replaced with actual Supabase auth
-      // Mock registration for now - note we're not setting the user
-      // because they need to verify their email first
-      
-      // In a real implementation with Supabase, this would send a verification email
-      console.log("Email verification would be sent to:", email);
-      
-      // Store in localStorage for demo purposes that this user started registration
-      localStorage.setItem("pendingVerification", email);
-      
-      // We don't set the user here since they need to verify first
-      
+      const { error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/verify-email`,
+        },
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
@@ -83,35 +106,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const verifyEmail = async (token: string) => {
-    setIsLoading(true);
-    try {
-      // TODO: Will be replaced with actual Supabase auth
-      // Mock email verification for now
-      const pendingEmail = localStorage.getItem("pendingVerification");
-      
-      if (pendingEmail) {
-        // In a real implementation, we would verify the token with Supabase
-        
-        // Create the verified user
-        const mockUser = { email: pendingEmail, isVerified: true };
-        localStorage.setItem("authUser", JSON.stringify(mockUser));
-        localStorage.removeItem("pendingVerification");
-        setUser(mockUser);
-      }
-    } catch (error) {
-      console.error("Email verification error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    // With Supabase, email verification is handled automatically
+    // This function remains for API consistency but won't do anything
+    console.log("Email verification token:", token);
+    return Promise.resolve();
   };
 
   const logout = async () => {
     setIsLoading(true);
     try {
-      // TODO: Will be replaced with actual Supabase auth
-      localStorage.removeItem("authUser");
-      setUser(null);
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
     } catch (error) {
       console.error("Logout error:", error);
       throw error;
@@ -123,8 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resetPassword = async (email: string) => {
     setIsLoading(true);
     try {
-      // TODO: Will be implemented with Supabase
-      console.log("Password reset for:", email);
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Password reset error:", error);
       throw error;
