@@ -26,9 +26,11 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: "Passwort muss mindestens 6 Zeichen haben." }),
 });
 
-const registerSchema = loginSchema.extend({
-  confirmPassword: z.string().min(6),
-}).refine(data => data.password === data.confirmPassword, {
+const registerSchema = z.object({
+  email: z.string().email({ message: "Ungültige Email-Adresse." }),
+  password: z.string().min(6, { message: "Passwort muss mindestens 6 Zeichen haben." }),
+  confirmPassword: z.string().min(6, { message: "Passwort muss mindestens 6 Zeichen haben." }),
+}).refine((data) => data.password === data.confirmPassword, {
   message: "Passwörter stimmen nicht überein",
   path: ["confirmPassword"],
 });
@@ -119,6 +121,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
       });
       
     } catch (error) {
+      console.error("Registration error:", error);
       toast({
         title: "Fehler bei der Registrierung",
         description: "Bitte überprüfen Sie Ihre Eingaben.",
@@ -255,6 +258,7 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                       <Input 
                         placeholder="name@beispiel.de" 
                         {...field} 
+                        type="email"
                         disabled={isLoading || !isSupabaseReady}
                       />
                     </FormControl>
