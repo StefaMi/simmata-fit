@@ -1,0 +1,171 @@
+
+import { useState, useEffect, ReactNode } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
+import { supabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { loginWithEmail, registerWithEmail, logoutUser, resetUserPassword, verifyUserEmail } from "@/utils/authUtils";
+
+type AuthUser = {
+  email: string;
+  id: string;
+  name?: string;
+  isVerified?: boolean;
+} | null;
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const isSupabaseReady = isSupabaseConfigured();
+  const { toast } = useToast();
+  
+  // Show warning toast if Supabase is not configured
+  useEffect(() => {
+    if (!isSupabaseReady) {
+      toast({
+        title: "Supabase not configured",
+        description: "Authentication features won't work without Supabase credentials",
+        variant: "destructive",
+      });
+    }
+  }, [isSupabaseReady, toast]);
+
+  // Update user state when auth state changes
+  useEffect(() => {
+    if (!isSupabaseReady) {
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoading(true);
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            isVerified: session.user.email_confirmed_at ? true : false,
+          });
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
+      }
+    );
+
+    // Get initial session
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            isVerified: session.user.email_confirmed_at ? true : false,
+          });
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isSupabaseReady, toast]);
+
+  const login = async (email: string, password: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase ist nicht konfiguriert");
+    }
+    
+    setIsLoading(true);
+    try {
+      await loginWithEmail(email, password);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (email: string, password: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase ist nicht konfiguriert");
+    }
+    
+    setIsLoading(true);
+    try {
+      // Log the registration attempt for debugging
+      console.log("Attempting to register user with email:", email);
+      
+      const data = await registerWithEmail(email, password);
+      console.log("Registration response:", data);
+      
+      return data;
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase ist nicht konfiguriert");
+    }
+    
+    setIsLoading(true);
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase ist nicht konfiguriert");
+    }
+    
+    setIsLoading(true);
+    try {
+      await resetUserPassword(email);
+    } catch (error) {
+      console.error("Password reset error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyEmail = async (token: string) => {
+    if (!isSupabaseReady) {
+      throw new Error("Supabase ist nicht konfiguriert");
+    }
+    
+    return verifyUserEmail(token);
+  };
+
+  const value = {
+    user,
+    isLoading,
+    login,
+    register,
+    logout,
+    resetPassword,
+    verifyEmail,
+    isSupabaseReady
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
