@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     if (!isSupabaseReady) {
-      throw new Error("Supabase is not configured");
+      throw new Error("Supabase ist nicht konfiguriert");
     }
     
     setIsLoading(true);
@@ -120,6 +120,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Log the registration attempt for debugging
       console.log("Attempting to register user with email:", email);
       
+      // First check if the email exists already
+      const { data: existingUsers, error: checkError } = await supabaseClient
+        .from('profiles')
+        .select('email')
+        .eq('email', email)
+        .limit(1);
+      
+      if (checkError) {
+        console.error("Error checking existing user:", checkError);
+      }
+      
+      // If email exists, throw an error
+      if (existingUsers && existingUsers.length > 0) {
+        throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
+      }
+      
+      // Proceed with registration
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
@@ -130,13 +147,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (error) {
         console.error("Supabase registration error:", error);
+        
+        // Handle specific Supabase errors with user-friendly messages
+        if (error.message.includes("already registered")) {
+          throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
+        }
+        
         throw error;
       }
       
       console.log("Registration response:", data);
       
-      // Check if user is already registered
-      if (data?.user?.identities?.length === 0) {
+      // If user is already registered
+      if (data?.user?.identities && data.user.identities.length === 0) {
         throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
       }
       
@@ -151,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyEmail = async (token: string) => {
     if (!isSupabaseReady) {
-      throw new Error("Supabase is not configured");
+      throw new Error("Supabase ist nicht konfiguriert");
     }
     
     // With Supabase, email verification is handled automatically
@@ -162,7 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     if (!isSupabaseReady) {
-      throw new Error("Supabase is not configured");
+      throw new Error("Supabase ist nicht konfiguriert");
     }
     
     setIsLoading(true);
@@ -179,7 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = async (email: string) => {
     if (!isSupabaseReady) {
-      throw new Error("Supabase is not configured");
+      throw new Error("Supabase ist nicht konfiguriert");
     }
     
     setIsLoading(true);

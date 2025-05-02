@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Apple, Facebook, Mail } from "lucide-react";
+import { Apple, Facebook, Mail, Eye, EyeOff } from "lucide-react";
 
 import {
   Form,
@@ -46,6 +46,8 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login, register, isSupabaseReady } = useAuth();
@@ -238,12 +240,28 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                   <FormItem>
                     <FormLabel>Passwort</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="******" 
-                        {...field} 
-                        disabled={isLoading || !isSupabaseReady}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"}
+                          placeholder="******" 
+                          {...field} 
+                          disabled={isLoading || !isSupabaseReady}
+                          className="pr-10"
+                        />
+                        <Button 
+                          type="button"
+                          variant="ghost" 
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowPassword(!showPassword)}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? 
+                            <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          }
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -292,12 +310,28 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                   <FormItem>
                     <FormLabel>Passwort</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="******" 
-                        {...field} 
-                        disabled={isLoading || !isSupabaseReady}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"}
+                          placeholder="******" 
+                          {...field} 
+                          disabled={isLoading || !isSupabaseReady}
+                          className="pr-10"
+                        />
+                        <Button 
+                          type="button"
+                          variant="ghost" 
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowPassword(!showPassword)}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? 
+                            <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          }
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -310,12 +344,28 @@ const AuthForm = ({ onSuccess }: AuthFormProps) => {
                   <FormItem>
                     <FormLabel>Passwort bestätigen</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="******" 
-                        {...field} 
-                        disabled={isLoading || !isSupabaseReady}
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="******" 
+                          {...field} 
+                          disabled={isLoading || !isSupabaseReady}
+                          className="pr-10"
+                        />
+                        <Button 
+                          type="button"
+                          variant="ghost" 
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          tabIndex={-1}
+                        >
+                          {showConfirmPassword ? 
+                            <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          }
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
