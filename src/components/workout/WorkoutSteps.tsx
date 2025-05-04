@@ -24,20 +24,16 @@ const WorkoutSteps = ({
     return null;
   }
   
-  const handleBodyPartSave = (bodyParts: BodyPart[]) => {
-    console.log("Body parts selected:", bodyParts);
-    onSaveBodyParts(bodyParts);
-  };
-  
-  const handleEquipmentSelect = (equipment: string[]) => {
-    console.log("Equipment selected:", equipment);
-    onSelectEquipment(equipment);
-  };
-  
   return (
     <div className="space-y-6">
-      <BodyPartSelector onSave={handleBodyPartSave} initialSelection={selectedParts} />
-      <EquipmentSelector onChange={handleEquipmentSelect} initialSelection={['bodyweight', 'dumbbells']} />
+      <BodyPartSelector 
+        onSave={onSaveBodyParts}
+        initialSelection={selectedParts} 
+      />
+      <EquipmentSelector 
+        onChange={onSelectEquipment} 
+        initialSelection={['bodyweight', 'dumbbells']} 
+      />
     </div>
   );
 };

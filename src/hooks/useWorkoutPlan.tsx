@@ -15,12 +15,24 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
   // Load saved workout plan on mount
   useEffect(() => {
     const savedWorkoutPlan = localStorage.getItem("workoutPlan");
+    const savedBodyParts = localStorage.getItem("selectedBodyParts");
+    
+    if (savedBodyParts) {
+      try {
+        const parts = JSON.parse(savedBodyParts);
+        console.log("Loaded saved body parts:", parts);
+        setSelectedParts(parts);
+      } catch (error) {
+        console.error("Error parsing saved body parts:", error);
+      }
+    }
+    
     if (savedWorkoutPlan) {
       try {
         const plan = JSON.parse(savedWorkoutPlan);
         console.log("Loaded saved workout plan:", plan);
         setWorkoutPlan(plan);
-        setStep(2); // Springe direkt zur Anzeige des Plans
+        setStep(2); // Show the plan
       } catch (error) {
         console.error("Fehler beim Parsen des gespeicherten Trainingsplans:", error);
       }
@@ -33,6 +45,11 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       localStorage.setItem("workoutPlan", JSON.stringify(workoutPlan));
     }
   }, [workoutPlan]);
+
+  // Save selected body parts to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem("selectedBodyParts", JSON.stringify(selectedParts));
+  }, [selectedParts]);
 
   // Handler für die Auswahl der Körperteile
   const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
@@ -49,6 +66,15 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       return;
     }
     
+    if (bodyParts.length === 0) {
+      toast({
+        title: "Keine Körperteile ausgewählt",
+        description: "Bitte wähle mindestens ein Körperteil aus.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Erstelle den Trainingsplan mit optimierten Trainingstagen
     const plan = createWorkoutPlan(bodyParts, userProfile);
     console.log("Created workout plan:", plan);
@@ -59,6 +85,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     
     // Speichere den Plan im localStorage
     localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
+    localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
     
     toast({
       title: "Trainingsplan erstellt",
@@ -71,7 +98,6 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
   const handleReset = () => {
     console.log("Resetting workout plan");
     setStep(1);
-    setSelectedParts([]);
     setWorkoutPlan(null);
     localStorage.removeItem("workoutPlan");
   };

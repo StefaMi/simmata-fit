@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,8 +25,16 @@ const bodyPartOptions: { value: BodyPart; label: string; icon: React.ReactNode }
 
 const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorProps) => {
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>(initialSelection);
+  
+  // Update local state when initialSelection changes
+  useEffect(() => {
+    if (initialSelection.length > 0) {
+      setSelectedParts(initialSelection);
+    }
+  }, [initialSelection]);
 
   const handleToggle = (bodyPart: BodyPart) => {
+    console.log(`Toggling ${bodyPart}`);
     setSelectedParts((prev) =>
       prev.includes(bodyPart)
         ? prev.filter((part) => part !== bodyPart)
@@ -36,6 +44,7 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting selected parts:", selectedParts);
     onSave(selectedParts);
   };
 
@@ -76,6 +85,7 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
                     <Checkbox
                       id={`bodypart-${option.value}`}
                       checked={selectedParts.includes(option.value)}
+                      onCheckedChange={() => handleToggle(option.value)}
                       className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
                     />
                   </div>
