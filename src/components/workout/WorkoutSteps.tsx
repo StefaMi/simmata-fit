@@ -17,15 +17,27 @@ const WorkoutSteps = ({
   onSaveBodyParts, 
   onSelectEquipment 
 }: WorkoutStepsProps) => {
-  // Only render components when we're on step 1
+  console.log("WorkoutSteps rendered", { step, selectedParts });
+  
+  // Only proceed if we're on step 1
   if (step !== 1) {
     return null;
   }
   
+  const handleBodyPartSave = (bodyParts: BodyPart[]) => {
+    console.log("Body parts selected:", bodyParts);
+    onSaveBodyParts(bodyParts);
+  };
+  
+  const handleEquipmentSelect = (equipment: string[]) => {
+    console.log("Equipment selected:", equipment);
+    onSelectEquipment(equipment);
+  };
+  
   return (
     <div className="space-y-6">
-      <BodyPartSelector onSave={onSaveBodyParts} initialSelection={selectedParts} />
-      <EquipmentSelector onChange={onSelectEquipment} initialSelection={['bodyweight', 'dumbbells']} />
+      <BodyPartSelector onSave={handleBodyPartSave} initialSelection={selectedParts} />
+      <EquipmentSelector onChange={handleEquipmentSelect} initialSelection={['bodyweight', 'dumbbells']} />
     </div>
   );
 };
