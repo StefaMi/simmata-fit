@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { WorkoutPlan, UserProfile, BodyPart } from "@/types";
 import { createWorkoutPlan } from "@/utils/calculators";
 import { optimizeWorkoutDays } from "@/utils/workoutUtils";
@@ -11,13 +11,23 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>(['bodyweight', 'dumbbells']);
   const [step, setStep] = useState<1 | 2>(1);
+  
+  // Add a mounted ref to prevent state updates after unmount
+  const isMounted = useRef(true);
+  
+  useEffect(() => {
+    // Set up the mounted ref
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   // Load saved workout plan on mount
   useEffect(() => {
     const savedWorkoutPlan = localStorage.getItem("workoutPlan");
     const savedBodyParts = localStorage.getItem("selectedBodyParts");
     
-    if (savedBodyParts) {
+    if (savedBodyParts && isMounted.current) {
       try {
         const parts = JSON.parse(savedBodyParts);
         console.log("Loaded saved body parts:", parts);
@@ -27,7 +37,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       }
     }
     
-    if (savedWorkoutPlan) {
+    if (savedWorkoutPlan && isMounted.current) {
       try {
         const plan = JSON.parse(savedWorkoutPlan);
         console.log("Loaded saved workout plan:", plan);
@@ -53,9 +63,11 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     }
   }, [selectedParts]);
 
-  // Handler für die Auswahl der Körperteile
-  const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
+  // Use useCallback to memoize these functions
+  const handleSaveBodyParts = useCallback((bodyParts: BodyPart[]) => {
     console.log("handleSaveBodyParts called with:", bodyParts);
+    
+    if (!isMounted.current) return;
     setSelectedParts(bodyParts);
     
     if (!userProfile) {
@@ -83,6 +95,8 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     
     // Optimierte Trainingstage nach Frequenz
     const optimizedPlan = optimizeWorkoutDays(plan);
+    
+    if (!isMounted.current) return;
     setWorkoutPlan(optimizedPlan);
     
     // Speichere den Plan im localStorage
@@ -94,15 +108,18 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       description: "Dein personalisierter Trainingsplan wurde erstellt. Du kannst die Trainingshäufigkeit jederzeit anpassen.",
     });
     
+    if (!isMounted.current) return;
     setStep(2);
-  };
+  }, [userProfile, toast]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     console.log("Resetting workout plan");
+    
+    if (!isMounted.current) return;
     setStep(1);
     setWorkoutPlan(null);
     localStorage.removeItem("workoutPlan");
-  };
+  }, []);
 
   return {
     workoutPlan,

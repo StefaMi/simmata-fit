@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import BodyPartSelector from "@/components/body-part/BodyPartSelector";
 import EquipmentSelector from "@/components/EquipmentSelector";
 import { BodyPart } from "@/types";
@@ -19,7 +19,7 @@ const WorkoutSteps = ({
 }: WorkoutStepsProps) => {
   console.log("WorkoutSteps rendered", { step, selectedParts });
   
-  // Only proceed if we're on step 1
+  // Only render if we're on step 1
   if (step !== 1) {
     return null;
   }

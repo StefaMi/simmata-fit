@@ -13,9 +13,7 @@ type BodyPartOptionProps = {
 };
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
-  const handleToggle = (e: React.MouseEvent) => {
-    // Prevent default to avoid checkbox conflicts
-    e.preventDefault();
+  const handleToggle = () => {
     onToggle(value);
   };
   
@@ -44,8 +42,9 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
           <Checkbox
             id={`bodypart-${value}`}
             checked={isSelected}
-            // No onCheckedChange here - using the div onClick instead
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
+            // Remove any change handlers from the checkbox itself
+            // We're using the parent div's onClick instead
           />
         </div>
       </div>
