@@ -16,6 +16,8 @@ import WorkoutPage from "./pages/WorkoutPage";
 import NutritionPage from "./pages/NutritionPage";
 import FocusPage from "./pages/FocusPage"; 
 import ProgressPage from "./pages/ProgressPage";
+import DashboardPage from "./pages/DashboardPage";
+import WorkoutBuilderPage from "./pages/WorkoutBuilderPage";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -77,9 +79,10 @@ const AppRoutes = () => {
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       
       {/* Protected routes */}
-      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+      <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
+      <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
       <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
       <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />
       <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
