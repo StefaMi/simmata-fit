@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Dumbbell, Heart, User, Home } from "lucide-react";
 import UserMenu from "@/components/auth/UserMenu";
+import { ModeToggle } from "@/components/ModeToggle";
 
 type Props = {
   children: ReactNode;
@@ -22,13 +23,18 @@ const Layout = ({ children, hideNav = false }: Props) => {
   const isCurrentPath = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex flex-col dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col dark:bg-gray-900 transition-colors duration-300">
       {/* Header with navigation */}
-      <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-10">
+      <header className="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-10 backdrop-blur-lg bg-white/80 dark:bg-gray-800/80">
         <div className="container mx-auto py-4 px-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-2xl font-bold text-fitness-primary dark:text-fitness-accent">Rush</Link>
-            <UserMenu />
+            <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-fitness-primary to-fitness-accent bg-clip-text text-transparent">
+              Rush
+            </Link>
+            <div className="flex items-center gap-4">
+              <ModeToggle />
+              <UserMenu />
+            </div>
           </div>
           
           {/* Navigation - now at the top */}

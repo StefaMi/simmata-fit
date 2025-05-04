@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { Dumbbell, User } from "lucide-react";
 
 type EquipmentType = 'bodyweight' | 'dumbbells' | 'barbell' | 'machine' | 'other';
@@ -44,7 +45,7 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
   };
 
   return (
-    <Card className="dark:bg-gray-800 dark:border-gray-700">
+    <Card className="backdrop-blur-md bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xl">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2 dark:text-white">
           <Dumbbell className="h-5 w-5 text-fitness-primary dark:text-fitness-accent" />
@@ -54,21 +55,17 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
       <CardContent>
         <div className="flex flex-wrap gap-2">
           {equipmentOptions.map(option => (
-            <Button
+            <Toggle
               key={option.type}
-              variant={selectedEquipment.includes(option.type) ? "default" : "outline"}
-              className={selectedEquipment.includes(option.type) 
-                ? "bg-fitness-primary hover:bg-fitness-primary/90 dark:bg-fitness-accent dark:hover:bg-fitness-accent/90" 
-                : "border-fitness-primary text-fitness-primary hover:bg-fitness-primary/10 dark:border-fitness-accent dark:text-fitness-accent dark:hover:bg-fitness-accent/10"
-              }
-              onClick={() => handleToggleEquipment(option.type)}
-              type="button"
+              pressed={selectedEquipment.includes(option.type)}
+              onPressedChange={() => handleToggleEquipment(option.type)}
+              className="data-[state=on]:bg-fitness-primary data-[state=on]:text-white dark:data-[state=on]:bg-fitness-accent"
             >
               <div className="flex items-center gap-2">
                 {option.icon}
                 {option.label}
               </div>
-            </Button>
+            </Toggle>
           ))}
         </div>
       </CardContent>

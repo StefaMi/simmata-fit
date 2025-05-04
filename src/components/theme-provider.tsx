@@ -1,7 +1,7 @@
 
 import * as React from "react";
 
-type Theme = "dark" | "light" | "system";
+export type Theme = "dark" | "light" | "system";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -43,11 +43,29 @@ export function ThemeProvider({
         : "light";
 
       root.classList.add(systemTheme);
+      // Update also the meta theme-color for mobile browsers
+      updateThemeColor(systemTheme);
       return;
     }
 
     root.classList.add(theme);
+    updateThemeColor(theme);
   }, [theme]);
+  
+  // Function to update theme-color meta tag for mobile browsers
+  const updateThemeColor = (activeTheme: string) => {
+    const metaThemeColor = document.querySelector("meta[name='theme-color']");
+    const color = activeTheme === "dark" ? "#0f172a" : "#ffffff";
+    
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", color);
+    } else {
+      const meta = document.createElement("meta");
+      meta.name = "theme-color";
+      meta.content = color;
+      document.head.appendChild(meta);
+    }
+  };
 
   const value = React.useMemo(
     () => ({

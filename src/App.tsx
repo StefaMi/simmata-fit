@@ -31,7 +31,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Lädt...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="animate-pulse text-fitness-primary dark:text-fitness-accent font-bold">Lädt...</div>
+      </div>
+    );
   }
   
   // In admin mode, always allow access
@@ -48,9 +52,6 @@ const AppRoutes = () => {
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
     document.body.classList.add("mobile-app");
-    
-    // Set dark mode by default
-    document.documentElement.classList.add("dark");
     
     // Hardware back button handling for Android
     const handleBackButton = () => {
@@ -96,7 +97,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ThemeProvider>
             <TooltipProvider>
               <Toaster />
               <Sonner />

@@ -33,7 +33,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 199 89% 39%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -69,16 +69,47 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-200;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 .fitness-gradient {
   @apply bg-gradient-to-r from-fitness-primary to-fitness-secondary dark:from-fitness-accent dark:to-fitness-primary;
+}
+
+/* Modern Card Styles */
+.modern-card {
+  @apply backdrop-blur-md bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl;
+}
+
+/* Glassmorphism Effect */
+.glass-card {
+  @apply backdrop-blur-lg bg-white/50 dark:bg-slate-900/50 border border-white/20 dark:border-slate-700/20 shadow-xl rounded-xl;
+}
+
+/* Glowing effect on hover */
+.glow-on-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-fitness-primary/20 dark:hover:shadow-fitness-accent/20;
+}
+
+/* Text gradient */
+.text-gradient {
+  @apply bg-gradient-to-r from-fitness-primary to-fitness-accent bg-clip-text text-transparent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 /* Dark mode styling */
@@ -98,4 +129,22 @@
 
 html.dark {
   color-scheme: dark;
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-500;
 }

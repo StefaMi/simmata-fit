@@ -65,15 +65,17 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Ernährungseintrag</CardTitle>
-        <CardDescription>
+    <Card className="w-full max-w-2xl mx-auto backdrop-blur-md bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xl">
+      <CardHeader className="border-b border-slate-100 dark:border-slate-700">
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-fitness-primary to-fitness-accent bg-clip-text text-transparent">
+          Ernährungseintrag
+        </CardTitle>
+        <CardDescription className="dark:text-slate-300">
           Erfasse deine Mahlzeiten und verfolge deinen Nährstoffverbrauch.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent className="p-6 pt-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="food-name">Lebensmittel/Mahlzeit</Label>
             <Input
@@ -81,6 +83,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
               value={nutritionEntry.name}
               onChange={(e) => handleChange("name", e.target.value)}
               placeholder="z.B. Haferflocken mit Beeren"
+              className="bg-white dark:bg-slate-700"
               required
             />
           </div>
@@ -94,6 +97,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
                 value={nutritionEntry.calories}
                 onChange={(e) => handleChange("calories", parseInt(e.target.value))}
                 min="0"
+                className="bg-white dark:bg-slate-700"
                 required
               />
             </div>
@@ -107,6 +111,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
                 onChange={(e) => handleChange("protein", parseInt(e.target.value))}
                 min="0"
                 step="0.1"
+                className="bg-white dark:bg-slate-700"
               />
             </div>
 
@@ -119,6 +124,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
                 onChange={(e) => handleChange("carbs", parseInt(e.target.value))}
                 min="0"
                 step="0.1"
+                className="bg-white dark:bg-slate-700"
               />
             </div>
 
@@ -131,6 +137,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
                 onChange={(e) => handleChange("fat", parseInt(e.target.value))}
                 min="0"
                 step="0.1"
+                className="bg-white dark:bg-slate-700"
               />
             </div>
           </div>
@@ -141,7 +148,7 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
               value={nutritionEntry.mealType}
               onValueChange={(value) => handleChange("mealType", value as "breakfast" | "lunch" | "dinner" | "snack")}
             >
-              <SelectTrigger id="meal-type">
+              <SelectTrigger id="meal-type" className="bg-white dark:bg-slate-700">
                 <SelectValue placeholder="Wähle einen Mahlzeitentyp" />
               </SelectTrigger>
               <SelectContent>
@@ -160,11 +167,15 @@ const NutritionForm = ({ onSave }: NutritionFormProps) => {
               type="date"
               value={nutritionEntry.date}
               onChange={(e) => handleChange("date", e.target.value)}
+              className="bg-white dark:bg-slate-700"
               required
             />
           </div>
 
-          <Button type="submit" className="w-full fitness-gradient">
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-fitness-primary to-fitness-accent text-white hover:from-fitness-secondary hover:to-fitness-primary transition-all duration-300"
+          >
             Eintrag speichern
           </Button>
         </form>
