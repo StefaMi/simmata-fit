@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import WorkoutPlanDisplay from "@/components/WorkoutPlanDisplay";
@@ -23,9 +23,27 @@ const WorkoutDisplay = ({
   onProgressUpdate,
   onReset
 }: WorkoutDisplayProps) => {
+  const isMounted = useRef(true);
+  
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  
   if (step !== 2 || !workoutPlan) {
     return null;
   }
+
+  const handleReset = () => {
+    if (!isMounted.current) return;
+    onReset();
+  };
+  
+  const handleProgressUpdate = (entry: any) => {
+    if (!isMounted.current) return;
+    onProgressUpdate(entry);
+  };
 
   return (
     <>
@@ -33,7 +51,7 @@ const WorkoutDisplay = ({
         <Button 
           variant="outline"
           className="flex items-center gap-2"
-          onClick={onReset}
+          onClick={handleReset}
         >
           <ArrowLeft className="h-4 w-4" />
           Neuen Plan erstellen
@@ -45,7 +63,7 @@ const WorkoutDisplay = ({
         <div className="mt-8">
           <ProgressTracker 
             userProfile={userProfile}
-            onProgressUpdate={onProgressUpdate}
+            onProgressUpdate={handleProgressUpdate}
             latestEntry={progressEntries.length > 0 ? progressEntries[0] : undefined}
           />
         </div>

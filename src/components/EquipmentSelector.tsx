@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,13 @@ type EquipmentSelectorProps = {
 
 const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelectorProps) => {
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType[]>(initialSelection);
+  const isMounted = useRef(true);
+  
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const equipmentOptions: { type: EquipmentType; label: string; icon: React.ReactNode }[] = [
     { type: 'bodyweight', label: 'Körpergewicht', icon: <User className="h-5 w-5" /> },
@@ -24,6 +31,8 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
   ];
 
   const handleToggleEquipment = (type: EquipmentType) => {
+    if (!isMounted.current) return;
+    
     setSelectedEquipment(prev => {
       const isSelected = prev.includes(type);
       const newSelection = isSelected 
