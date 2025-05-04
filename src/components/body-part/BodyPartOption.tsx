@@ -13,10 +13,10 @@ type BodyPartOptionProps = {
 };
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
-  const handleToggle = () => {
+  const handleClick = () => {
     onToggle(value);
   };
-  
+
   return (
     <div
       className={`border rounded-lg p-4 cursor-pointer transition-all ${
@@ -24,7 +24,7 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
           ? "border-fitness-primary bg-fitness-primary bg-opacity-10"
           : "border-gray-200 hover:border-fitness-primary"
       }`}
-      onClick={handleToggle}
+      onClick={handleClick}
     >
       <div className="flex flex-col items-center space-y-2">
         <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10">
@@ -43,8 +43,7 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
             id={`bodypart-${value}`}
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
-            // Remove any change handlers from the checkbox itself
-            // We're using the parent div's onClick instead
+            readOnly
           />
         </div>
       </div>

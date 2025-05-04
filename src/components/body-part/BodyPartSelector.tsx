@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BodyPart } from "@/types";
@@ -12,25 +12,15 @@ type BodyPartSelectorProps = {
 
 const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorProps) => {
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>(initialSelection);
-  const isMounted = useRef(true);
-  
-  // Set up the mounted ref
-  useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
   
   // Update local state when initialSelection changes
   useEffect(() => {
-    if (initialSelection.length > 0 && isMounted.current) {
+    if (initialSelection.length > 0) {
       setSelectedParts(initialSelection);
     }
   }, [initialSelection]);
 
   const handleToggle = (bodyPart: BodyPart) => {
-    if (!isMounted.current) return;
-    
     console.log(`Toggling ${bodyPart}`);
     setSelectedParts((prev) =>
       prev.includes(bodyPart)

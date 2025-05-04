@@ -1,8 +1,7 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Dumbbell, User } from "lucide-react";
 
 type EquipmentType = 'bodyweight' | 'dumbbells' | 'barbell' | 'machine' | 'other';
@@ -14,13 +13,12 @@ type EquipmentSelectorProps = {
 
 const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelectorProps) => {
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType[]>(initialSelection);
-  const isMounted = useRef(true);
   
   useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
+    if (initialSelection.length > 0) {
+      setSelectedEquipment(initialSelection);
+    }
+  }, [initialSelection]);
 
   const equipmentOptions: { type: EquipmentType; label: string; icon: React.ReactNode }[] = [
     { type: 'bodyweight', label: 'Körpergewicht', icon: <User className="h-5 w-5" /> },
@@ -31,7 +29,7 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
   ];
 
   const handleToggleEquipment = (type: EquipmentType) => {
-    if (!isMounted.current) return;
+    console.log(`Toggling equipment: ${type}`);
     
     setSelectedEquipment(prev => {
       const isSelected = prev.includes(type);
@@ -64,6 +62,7 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
                 : "border-fitness-primary text-fitness-primary hover:bg-fitness-primary/10"
               }
               onClick={() => handleToggleEquipment(option.type)}
+              type="button"
             >
               <div className="flex items-center gap-2">
                 {option.icon}
