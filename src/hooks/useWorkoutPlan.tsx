@@ -48,7 +48,9 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
 
   // Save selected body parts to localStorage when they change
   useEffect(() => {
-    localStorage.setItem("selectedBodyParts", JSON.stringify(selectedParts));
+    if (selectedParts.length > 0) {
+      localStorage.setItem("selectedBodyParts", JSON.stringify(selectedParts));
+    }
   }, [selectedParts]);
 
   // Handler für die Auswahl der Körperteile

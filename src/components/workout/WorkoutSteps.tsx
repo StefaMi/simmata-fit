@@ -24,10 +24,15 @@ const WorkoutSteps = ({
     return null;
   }
   
+  const handleSaveBodyParts = (bodyParts: BodyPart[]) => {
+    console.log("Saving body parts:", bodyParts);
+    onSaveBodyParts(bodyParts);
+  };
+  
   return (
     <div className="space-y-6">
       <BodyPartSelector 
-        onSave={onSaveBodyParts}
+        onSave={handleSaveBodyParts}
         initialSelection={selectedParts} 
       />
       <EquipmentSelector 
