@@ -1,6 +1,6 @@
 
 import React from "react";
-import BodyPartSelector from "@/components/BodyPartSelector";
+import BodyPartSelector from "@/components/body-part/BodyPartSelector";
 import EquipmentSelector from "@/components/EquipmentSelector";
 import { BodyPart } from "@/types";
 
