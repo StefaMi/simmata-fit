@@ -43,7 +43,8 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
             id={`bodypart-${value}`}
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
-            readOnly
+            // Remove the readOnly prop as it's not supported by the Checkbox component
+            onCheckedChange={() => {}} // Use an empty function instead to make it effectively read-only
           />
         </div>
       </div>
