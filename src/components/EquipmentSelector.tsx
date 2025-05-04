@@ -44,10 +44,10 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
   };
 
   return (
-    <Card>
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardHeader>
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Dumbbell className="h-5 w-5 text-fitness-primary" />
+        <CardTitle className="text-xl flex items-center gap-2 dark:text-white">
+          <Dumbbell className="h-5 w-5 text-fitness-primary dark:text-fitness-accent" />
           Verfügbare Ausrüstung auswählen
         </CardTitle>
       </CardHeader>
@@ -58,8 +58,8 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
               key={option.type}
               variant={selectedEquipment.includes(option.type) ? "default" : "outline"}
               className={selectedEquipment.includes(option.type) 
-                ? "bg-fitness-primary hover:bg-fitness-primary/90" 
-                : "border-fitness-primary text-fitness-primary hover:bg-fitness-primary/10"
+                ? "bg-fitness-primary hover:bg-fitness-primary/90 dark:bg-fitness-accent dark:hover:bg-fitness-accent/90" 
+                : "border-fitness-primary text-fitness-primary hover:bg-fitness-primary/10 dark:border-fitness-accent dark:text-fitness-accent dark:hover:bg-fitness-accent/10"
               }
               onClick={() => handleToggleEquipment(option.type)}
               type="button"

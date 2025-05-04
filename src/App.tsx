@@ -17,6 +17,7 @@ import NutritionPage from "./pages/NutritionPage";
 import FocusPage from "./pages/FocusPage"; 
 import ProgressPage from "./pages/ProgressPage";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,9 @@ const AppRoutes = () => {
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
     document.body.classList.add("mobile-app");
+    
+    // Set dark mode by default
+    document.documentElement.classList.add("dark");
     
     // Hardware back button handling for Android
     const handleBackButton = () => {
@@ -89,13 +93,15 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </ThemeProvider>
         </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>

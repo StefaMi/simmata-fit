@@ -37,30 +37,30 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47.4% 11.2%;
     --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
+    
+    --card: 222.2 47.4% 11.2%;
     --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
+    
+    --popover: 222.2 47.4% 11.2%;
     --popover-foreground: 210 40% 98%;
-
+    
     --primary: 199 89% 48%;
     --primary-foreground: 210 40% 98%;
-
+    
     --secondary: 199 89% 39%;
     --secondary-foreground: 210 40% 98%;
-
+    
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
+    
     --accent: 199 84% 59%;
     --accent-foreground: 210 40% 98%;
-
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
+    
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -78,5 +78,24 @@
 }
 
 .fitness-gradient {
-  @apply bg-gradient-to-r from-fitness-primary to-fitness-secondary;
+  @apply bg-gradient-to-r from-fitness-primary to-fitness-secondary dark:from-fitness-accent dark:to-fitness-primary;
+}
+
+/* Dark mode styling */
+.dark .checkbox-icon {
+  @apply text-white;
+}
+
+.dark .card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .input,
+.dark .select,
+.dark .textarea {
+  @apply bg-gray-700 border-gray-600 text-white;
+}
+
+html.dark {
+  color-scheme: dark;
 }

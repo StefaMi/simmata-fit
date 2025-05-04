@@ -36,10 +36,10 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto dark:bg-gray-800 dark:border-gray-700">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Körperteile auswählen</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-bold dark:text-white">Körperteile auswählen</CardTitle>
+        <CardDescription className="dark:text-gray-300">
           Wähle die Körperteile aus, die du trainieren möchtest. Basierend auf deiner Auswahl erstellen wir einen personalisierten Trainingsplan.
         </CardDescription>
       </CardHeader>
@@ -52,7 +52,7 @@ const BodyPartSelector = ({ onSave, initialSelection = [] }: BodyPartSelectorPro
 
           <Button
             type="submit"
-            className="w-full fitness-gradient"
+            className="w-full fitness-gradient dark:hover:bg-fitness-accent/80"
             disabled={selectedParts.length === 0}
           >
             Trainingsplan erstellen

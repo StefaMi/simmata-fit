@@ -13,7 +13,8 @@ type BodyPartOptionProps = {
 };
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
-  const handleClick = () => {
+  // Separate handler für den Click auf die gesamte Komponente
+  const handleCardClick = () => {
     onToggle(value);
   };
 
@@ -21,19 +22,19 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
     <div
       className={`border rounded-lg p-4 cursor-pointer transition-all ${
         isSelected
-          ? "border-fitness-primary bg-fitness-primary bg-opacity-10"
-          : "border-gray-200 hover:border-fitness-primary"
+          ? "border-fitness-primary bg-fitness-primary bg-opacity-10 dark:border-fitness-accent dark:bg-fitness-accent/20"
+          : "border-gray-200 dark:border-gray-700 hover:border-fitness-primary dark:hover:border-fitness-accent"
       }`}
-      onClick={handleClick}
+      onClick={handleCardClick}
     >
       <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10">
+        <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10 dark:bg-fitness-primary/20">
           {icon}
         </div>
         <div className="text-center">
           <Label
             htmlFor={`bodypart-${value}`}
-            className="text-sm font-medium cursor-pointer"
+            className="text-sm font-medium cursor-pointer dark:text-gray-200"
           >
             {label}
           </Label>
@@ -43,8 +44,8 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
             id={`bodypart-${value}`}
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
-            // Remove the readOnly prop as it's not supported by the Checkbox component
-            onCheckedChange={() => {}} // Use an empty function instead to make it effectively read-only
+            // Mit onClick={e => e.stopPropagation()} verhindern wir doppelte Events
+            onCheckedChange={() => {}}
           />
         </div>
       </div>
