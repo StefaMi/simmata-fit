@@ -5,14 +5,14 @@ import { BodyPart } from "@/types";
 import BodyPartOption from "./BodyPartOption";
 
 export const bodyPartOptions: { value: BodyPart; label: string; icon: React.ReactNode }[] = [
-  { value: "chest", label: "Brust", icon: <Dumbbell className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "back", label: "Rücken", icon: <Weight className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "shoulders", label: "Schultern", icon: <Dumbbell className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "biceps", label: "Bizeps", icon: <Dumbbell className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "triceps", label: "Trizeps", icon: <Dumbbell className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "legs", label: "Beine", icon: <Weight className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "abs", label: "Bauch", icon: <Scale className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
-  { value: "cardio", label: "Kardio", icon: <Heart className="w-5 h-5 mr-2 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "chest", label: "Brust", icon: <Dumbbell className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "back", label: "Rücken", icon: <Weight className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "shoulders", label: "Schultern", icon: <Dumbbell className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "biceps", label: "Bizeps", icon: <Dumbbell className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "triceps", label: "Trizeps", icon: <Dumbbell className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "legs", label: "Beine", icon: <Weight className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "abs", label: "Bauch", icon: <Scale className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
+  { value: "cardio", label: "Kardio", icon: <Heart className="w-5 h-5 text-fitness-primary dark:text-fitness-accent" /> },
 ];
 
 type BodyPartOptionsProps = {

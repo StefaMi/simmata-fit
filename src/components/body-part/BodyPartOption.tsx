@@ -52,7 +52,6 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
             onCheckedChange={handleCheckboxChange}
-            // Stop propagation to prevent double-triggering with the card click
             onClick={(e) => e.stopPropagation()}
           />
         </div>

@@ -46,7 +46,7 @@ const WorkoutDisplay = ({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
         <Button 
           variant="outline"
@@ -68,7 +68,7 @@ const WorkoutDisplay = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
