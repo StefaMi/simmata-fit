@@ -13,9 +13,16 @@ type BodyPartOptionProps = {
 };
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
-  // Separate handler für den Click auf die gesamte Komponente
+  // Handler for click on the entire component
   const handleCardClick = () => {
     onToggle(value);
+  };
+
+  // Handle checkbox change separately to avoid event propagation issues
+  const handleCheckboxChange = (checked: boolean | "indeterminate") => {
+    if (checked !== "indeterminate") {
+      onToggle(value);
+    }
   };
 
   return (
@@ -44,8 +51,9 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
             id={`bodypart-${value}`}
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
-            // Mit onClick={e => e.stopPropagation()} verhindern wir doppelte Events
-            onCheckedChange={() => {}}
+            onCheckedChange={handleCheckboxChange}
+            // Stop propagation to prevent double-triggering with the card click
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       </div>

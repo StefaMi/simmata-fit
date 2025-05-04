@@ -9,7 +9,161 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      body_measurements: {
+        Row: {
+          arms: number | null
+          chest: number | null
+          created_at: string
+          hips: number | null
+          id: string
+          progress_id: string
+          thighs: number | null
+          waist: number | null
+        }
+        Insert: {
+          arms?: number | null
+          chest?: number | null
+          created_at?: string
+          hips?: number | null
+          id?: string
+          progress_id: string
+          thighs?: number | null
+          waist?: number | null
+        }
+        Update: {
+          arms?: number | null
+          chest?: number | null
+          created_at?: string
+          hips?: number | null
+          id?: string
+          progress_id?: string
+          thighs?: number | null
+          waist?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "body_measurements_progress_id_fkey"
+            columns: ["progress_id"]
+            isOneToOne: false
+            referencedRelation: "training_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorite_exercises: {
+        Row: {
+          body_part: string
+          created_at: string
+          exercise_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body_part: string
+          created_at?: string
+          exercise_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          body_part?: string
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      training_progress: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          weight: number | null
+          workout_completed: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          weight?: number | null
+          workout_completed?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+          workout_completed?: boolean | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      workout_sessions: {
+        Row: {
+          created_at: string
+          date: string
+          duration: number | null
+          id: string
+          intensity: string | null
+          updated_at: string
+          user_id: string
+          workout_plan_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          intensity?: string | null
+          updated_at?: string
+          user_id: string
+          workout_plan_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          intensity?: string | null
+          updated_at?: string
+          user_id?: string
+          workout_plan_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
