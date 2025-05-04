@@ -13,6 +13,12 @@ type BodyPartOptionProps = {
 };
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
+  const handleToggle = (e: React.MouseEvent) => {
+    // Prevent default to avoid checkbox conflicts
+    e.preventDefault();
+    onToggle(value);
+  };
+  
   return (
     <div
       className={`border rounded-lg p-4 cursor-pointer transition-all ${
@@ -20,7 +26,7 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
           ? "border-fitness-primary bg-fitness-primary bg-opacity-10"
           : "border-gray-200 hover:border-fitness-primary"
       }`}
-      onClick={() => onToggle(value)}
+      onClick={handleToggle}
     >
       <div className="flex flex-col items-center space-y-2">
         <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10">
@@ -38,7 +44,7 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
           <Checkbox
             id={`bodypart-${value}`}
             checked={isSelected}
-            onCheckedChange={() => onToggle(value)}
+            // No onCheckedChange here - using the div onClick instead
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
           />
         </div>
