@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Save, Edit, Clock } from "lucide-react";
 import { Exercise, BodyPart } from "@/types";
 import { bodyPartOptions } from "@/components/body-part/BodyPartOptions";
-import { exercises as exerciseData } from "@/data/exercises";
+import { exercises as exercisesList } from "@/data/exercises";
 import { useToast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 
@@ -58,7 +58,7 @@ const CustomWorkoutBuilder = () => {
   
   // Gefilterte Übungen basierend auf der Körperteil-Auswahl
   const filteredExercises = selectedBodyPart 
-    ? exerciseData.filter(ex => ex.bodyPart === selectedBodyPart) 
+    ? exercisesList.filter(ex => ex.bodyPart === selectedBodyPart) 
     : [];
   
   const resetExerciseForm = () => {
@@ -82,7 +82,7 @@ const CustomWorkoutBuilder = () => {
       return;
     }
     
-    const selectedExercise = exerciseData.find(ex => ex.id === selectedExerciseId);
+    const selectedExercise = exercisesList.find(ex => ex.id === selectedExerciseId);
     if (!selectedExercise) return;
     
     const newExercise: CustomExercise = {
@@ -121,11 +121,11 @@ const CustomWorkoutBuilder = () => {
   
   const handleEditExercise = (index: number) => {
     const exercise = selectedExercises[index];
-    const exerciseData = exercise.exerciseId ? 
-      exerciseData.find(ex => ex.id === exercise.exerciseId) : null;
+    const selectedExercise = exercise.exerciseId ? 
+      exercisesList.find(ex => ex.id === exercise.exerciseId) : null;
     
-    if (exerciseData) {
-      setSelectedBodyPart(exerciseData.bodyPart);
+    if (selectedExercise) {
+      setSelectedBodyPart(selectedExercise.bodyPart);
       setSelectedExerciseId(exercise.exerciseId);
       setExerciseSets(exercise.sets);
       setExerciseReps(exercise.reps);

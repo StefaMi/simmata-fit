@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +27,7 @@ const WorkoutTimer = ({
   const completeSound = new Audio("/assets/sounds/complete.mp3");
 
   useEffect(() => {
-    let intervalId: number;
+    let intervalId: NodeJS.Timeout;
     
     if (isActive && timeLeft > 0) {
       intervalId = setInterval(() => {
