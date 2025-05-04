@@ -17,7 +17,7 @@ const WorkoutSteps = ({
   onSaveBodyParts, 
   onSelectEquipment 
 }: WorkoutStepsProps) => {
-  if (step === 2) {
+  if (step !== 1) {
     return null;
   }
   

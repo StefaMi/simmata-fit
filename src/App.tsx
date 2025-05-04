@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +20,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Admin mode flag for development - set to true to bypass authentication
+const ADMIN_MODE = true;
+
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -27,11 +31,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div className="flex h-screen items-center justify-center">Lädt...</div>;
   }
   
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  // In admin mode, always allow access
+  if (ADMIN_MODE || user) {
+    return <>{children}</>;
   }
   
-  return <>{children}</>;
+  return <Navigate to="/login" replace />;
 };
 
 const AppRoutes = () => {
@@ -62,7 +67,8 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/profile" replace /> : <LoginPage />} />
+      {/* If in admin mode, redirect login to home page */}
+      <Route path="/login" element={ADMIN_MODE || user ? <Navigate to="/profile" replace /> : <LoginPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       
