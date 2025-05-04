@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MusicPlaylist, MusicProvider } from "@/types";
-import { Music, ExternalLink, Spotify, Youtube, Headphones, Apple } from "lucide-react";
+import { Music, ExternalLink, Headphones, Youtube, Apple } from "lucide-react";
 
 // Beispiel-Playlists
 const samplePlaylists: MusicPlaylist[] = [
@@ -90,7 +90,7 @@ const MusicIntegration = () => {
   const getProviderIcon = (provider: MusicProvider) => {
     switch(provider) {
       case "spotify":
-        return <Spotify className="h-5 w-5" />;
+        return <Music className="h-5 w-5 text-green-500" />; // Using Music icon for Spotify
       case "apple":
         return <Apple className="h-5 w-5" />;
       case "youtube":
@@ -123,10 +123,18 @@ const MusicIntegration = () => {
       <CardContent className="p-5">
         <Tabs defaultValue="spotify" onValueChange={(value) => setActiveProvider(value as MusicProvider)}>
           <TabsList className="w-full mb-6 grid grid-cols-4">
-            <TabsTrigger value="spotify" className="flex items-center gap-1"><Spotify className="h-4 w-4" /> Spotify</TabsTrigger>
-            <TabsTrigger value="apple" className="flex items-center gap-1"><Apple className="h-4 w-4" /> Apple</TabsTrigger>
-            <TabsTrigger value="youtube" className="flex items-center gap-1"><Youtube className="h-4 w-4" /> YouTube</TabsTrigger>
-            <TabsTrigger value="amazon" className="flex items-center gap-1"><Headphones className="h-4 w-4" /> Amazon</TabsTrigger>
+            <TabsTrigger value="spotify" className="flex items-center gap-1">
+              <Music className="h-4 w-4 text-green-500" /> Spotify
+            </TabsTrigger>
+            <TabsTrigger value="apple" className="flex items-center gap-1">
+              <Apple className="h-4 w-4" /> Apple
+            </TabsTrigger>
+            <TabsTrigger value="youtube" className="flex items-center gap-1">
+              <Youtube className="h-4 w-4" /> YouTube
+            </TabsTrigger>
+            <TabsTrigger value="amazon" className="flex items-center gap-1">
+              <Headphones className="h-4 w-4" /> Amazon
+            </TabsTrigger>
           </TabsList>
           
           {["spotify", "apple", "youtube", "amazon"].map((provider) => (
@@ -143,7 +151,7 @@ const MusicIntegration = () => {
                           </div>
                         ) : (
                           <div className="w-20 h-20 flex-shrink-0 bg-gradient-to-br from-fitness-primary to-fitness-accent flex items-center justify-center text-white">
-                            {getProviderIcon(playlist.provider)}
+                            {getProviderIcon(provider as MusicProvider)}
                           </div>
                         )}
                         <CardContent className="p-3 flex flex-col justify-between flex-grow">
@@ -158,7 +166,7 @@ const MusicIntegration = () => {
                             onClick={() => openPlaylist(playlist.url)}
                           >
                             <ExternalLink className="h-3 w-3" />
-                            In {getProviderLabel(playlist.provider)} öffnen
+                            In {getProviderLabel(provider as MusicProvider)} öffnen
                           </Button>
                         </CardContent>
                       </div>

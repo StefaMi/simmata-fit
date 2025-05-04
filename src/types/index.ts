@@ -102,7 +102,7 @@ export type MotivationalQuote = {
 };
 
 // Typen für Musik-Integration
-export type MusicProvider = 'spotify' | 'apple';
+export type MusicProvider = 'spotify' | 'apple' | 'youtube' | 'amazon';
 
 export type MusicPlaylist = {
   id: string;
