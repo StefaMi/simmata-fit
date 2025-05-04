@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import BodyPartSelector from "@/components/BodyPartSelector";
 import EquipmentSelector from "@/components/EquipmentSelector";
 import { BodyPart } from "@/types";
@@ -17,15 +17,16 @@ const WorkoutSteps = ({
   onSaveBodyParts, 
   onSelectEquipment 
 }: WorkoutStepsProps) => {
+  // Only render components when we're on step 1
   if (step !== 1) {
     return null;
   }
   
   return (
-    <>
+    <div className="space-y-6">
       <BodyPartSelector onSave={onSaveBodyParts} initialSelection={selectedParts} />
       <EquipmentSelector onChange={onSelectEquipment} initialSelection={['bodyweight', 'dumbbells']} />
-    </>
+    </div>
   );
 };
 

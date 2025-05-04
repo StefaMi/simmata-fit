@@ -67,7 +67,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* If in admin mode, redirect login to home page */}
+      {/* Always make login page accessible, but redirect if admin mode or logged in */}
       <Route path="/login" element={ADMIN_MODE || user ? <Navigate to="/profile" replace /> : <LoginPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
