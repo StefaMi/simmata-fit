@@ -11,18 +11,34 @@ const EmailConfirmedPage = () => {
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Using a ref to store the timer ID ensures we can clean it up properly
+    // Clear any existing timer first
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+    }
+
+    // Set a new timer
     timerRef.current = window.setTimeout(() => {
+      timerRef.current = null; // Clear the reference
       navigate("/login");
     }, 5000);
 
-    // Clean up function that uses the ref
+    // Clean up function
     return () => {
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
     };
   }, [navigate]);
+
+  const handleLoginClick = () => {
+    // Clear the timer when manually navigating
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    navigate("/login");
+  };
 
   return (
     <Layout hideNav>
@@ -46,7 +62,7 @@ const EmailConfirmedPage = () => {
             </p>
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button onClick={() => navigate("/login")}>
+            <Button onClick={handleLoginClick}>
               Zum Login
             </Button>
           </CardFooter>

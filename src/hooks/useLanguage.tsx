@@ -44,38 +44,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const detectLanguage = async () => {
+    // Use a safe way to detect the language
+    const detectLanguage = () => {
       try {
         // Check for saved language preference first
         const savedLanguage = localStorage.getItem("preferredLanguage");
         
         if (savedLanguage) {
           setLanguage(savedLanguage);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Try to detect language by IP
-        // In a real app, you would use a geolocation API service
-        try {
-          const response = await fetch("https://ipapi.co/json/");
-          const data = await response.json();
-          
-          // Set language based on country code
-          // This is simplified, in a real app you'd have more mappings
-          if (data.country_code === "DE" || data.country_code === "AT" || data.country_code === "CH") {
-            setLanguage("de");
-          } else {
-            setLanguage("en");
-          }
-          
-          // Save the detected language
-          localStorage.setItem("preferredLanguage", language);
-        } catch (error) {
-          console.error("Error detecting language:", error);
-          // Default to German if detection fails
+        } else {
+          // Default to German if no saved preference
           setLanguage("de");
+          localStorage.setItem("preferredLanguage", "de");
         }
+      } catch (error) {
+        console.error("Error detecting language:", error);
+        // Default to German if detection fails
+        setLanguage("de");
       } finally {
         setIsLoading(false);
       }
@@ -92,7 +77,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Update language and save to localStorage
   const handleSetLanguage = (lang: string) => {
     setLanguage(lang);
-    localStorage.setItem("preferredLanguage", lang);
+    try {
+      localStorage.setItem("preferredLanguage", lang);
+    } catch (error) {
+      console.error("Error saving language preference:", error);
+    }
   };
 
   const value = {

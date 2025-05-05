@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -43,6 +44,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <Navigate to="/login" replace />;
 };
 
+// Separate AppRoutes to prevent hook logic issues
 const AppRoutes = () => {
   const { user } = useAuth();
 
@@ -78,7 +80,7 @@ const AppRoutes = () => {
       <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
       
       {/* Protected routes */}
-      <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
       <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
@@ -92,8 +94,8 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
+    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+      <BrowserRouter>
         <LanguageProvider>
           <AuthProvider>
             <TooltipProvider>
@@ -103,8 +105,8 @@ function App() {
             </TooltipProvider>
           </AuthProvider>
         </LanguageProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
