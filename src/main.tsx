@@ -6,12 +6,13 @@ import App from './App.tsx';
 import './index.css';
 import { registerServiceWorker } from './registerSW';
 
-// Create a client instance outside of the render function to ensure stability
+// Create a client instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
