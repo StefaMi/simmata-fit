@@ -15,7 +15,10 @@ const EmailConfirmedPage = () => {
       navigate("/login");
     }, 5000);
 
-    return () => clearTimeout(redirectTimer);
+    // Cleanup function to prevent memory leaks
+    return () => {
+      clearTimeout(redirectTimer);
+    };
   }, [navigate]);
 
   return (

@@ -98,9 +98,9 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <TooltipProvider>
+              <AppRoutes />
               <Toaster />
               <Sonner />
-              <AppRoutes />
             </TooltipProvider>
           </AuthProvider>
         </LanguageProvider>
