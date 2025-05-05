@@ -96,6 +96,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       
       // Optimierte Trainingstage nach Frequenz
       const optimizedPlan = optimizeWorkoutDays(plan);
+      console.log("Optimized workout plan:", optimizedPlan);
       
       if (!isMounted.current) return;
       setWorkoutPlan(optimizedPlan);

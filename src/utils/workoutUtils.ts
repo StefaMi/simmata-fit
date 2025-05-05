@@ -37,15 +37,26 @@ export const optimizeWorkoutDays = (plan: WorkoutPlan): WorkoutPlan => {
     newDays[day] = [];
   });
   
-  // Füge Übungen nur an optimalen Tagen ein
-  const oldDayNames = Object.keys(plan.days);
-  oldDayNames.sort(); // Sortiere, um konsistente Reihenfolge zu gewährleisten
+  // Sammle alle Übungen aus dem ursprünglichen Plan
+  const allExercises = Object.values(plan.days).flat();
   
-  optimalDays.forEach((optimalDay, index) => {
-    if (index < oldDayNames.length) {
-      newDays[optimalDay] = [...plan.days[oldDayNames[index]]];
-    }
-  });
+  // Übungen gleichmäßig auf die Trainingstage verteilen
+  if (allExercises.length > 0 && optimalDays.length > 0) {
+    // Sortiere Übungen nach Körperteilen für bessere Gruppierung
+    allExercises.sort((a, b) => a.bodyPart.localeCompare(b.bodyPart));
+    
+    // Berechne, wie viele Übungen pro Tag
+    const exercisesPerDay = Math.ceil(allExercises.length / optimalDays.length);
+    
+    // Verteile die Übungen
+    optimalDays.forEach((day, index) => {
+      const startIdx = index * exercisesPerDay;
+      const endIdx = Math.min(startIdx + exercisesPerDay, allExercises.length);
+      if (startIdx < allExercises.length) {
+        newDays[day] = allExercises.slice(startIdx, endIdx);
+      }
+    });
+  }
   
   // Aktualisiere die Beschreibung
   const updatedDescription = `Trainingsplan für ${

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Exercise, WorkoutPlan } from "@/types";
 import { Dumbbell, ExternalLink, Calendar } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
@@ -14,7 +14,7 @@ type WorkoutPlanDisplayProps = {
 
 const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
   const [frequency, setFrequency] = useState<number>(workoutPlan.frequency);
-  const dayNames = Object.keys(workoutPlan.days);
+  const [plan, setPlan] = useState<WorkoutPlan>(workoutPlan);
   
   // Map of optimal training days based on frequency
   const getOptimalTrainingDays = (freq: number): string[] => {
@@ -36,12 +36,73 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
     }
   };
   
+  // Update plan when frequency changes
+  useEffect(() => {
+    if (frequency !== workoutPlan.frequency) {
+      // Create a copy of the workout plan
+      const updatedPlan = { ...workoutPlan, frequency };
+      
+      // Get the optimal days for the new frequency
+      const optimalDays = getOptimalTrainingDays(frequency);
+      
+      // Collect all exercises from the original plan
+      const allExercises = Object.values(workoutPlan.days).flat();
+      
+      // Create new days object
+      const newDays: { [key: string]: Exercise[] } = {};
+      const allDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+      
+      // Initialize all days with empty arrays
+      allDays.forEach(day => {
+        newDays[day] = [];
+      });
+      
+      // Redistribute exercises to optimal days
+      if (allExercises.length > 0) {
+        // Sort exercises by body part for better grouping
+        const sortedExercises = [...allExercises].sort((a, b) => 
+          a.bodyPart.localeCompare(b.bodyPart));
+        
+        // Calculate exercises per day
+        const exercisesPerDay = Math.ceil(sortedExercises.length / optimalDays.length);
+        
+        // Distribute exercises
+        optimalDays.forEach((day, index) => {
+          const startIdx = index * exercisesPerDay;
+          const endIdx = Math.min(startIdx + exercisesPerDay, sortedExercises.length);
+          if (startIdx < sortedExercises.length) {
+            newDays[day] = sortedExercises.slice(startIdx, endIdx);
+          }
+        });
+      }
+      
+      // Update description
+      const updatedDescription = `Trainingsplan für ${
+        workoutPlan.description.includes("Gewichtsabnahme") ? "Gewichtsabnahme" : 
+        workoutPlan.description.includes("Muskelaufbau") ? "Muskelaufbau" : 
+        "Gewichtserhaltung"
+      } (${frequency}x pro Woche)`;
+      
+      // Create updated plan
+      const updatedPlanWithDays = {
+        ...updatedPlan,
+        description: updatedDescription,
+        days: newDays
+      };
+      
+      setPlan(updatedPlanWithDays);
+      
+      // Save updated plan to localStorage
+      localStorage.setItem("workoutPlan", JSON.stringify(updatedPlanWithDays));
+    }
+  }, [frequency, workoutPlan]);
+  
   // Get the optimal days for the current frequency
-  const optimizedDays = getOptimalTrainingDays(frequency);
+  const optimalDays = getOptimalTrainingDays(frequency);
   
   // Available days will be ordered according to the week
   const weekdayOrder = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-  const availableDays = optimizedDays.sort((a, b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
+  const availableDays = optimalDays.sort((a, b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
   
   // Create a list of all days showing which ones are rest days
   const allWeekDays = weekdayOrder.map(day => ({
@@ -54,11 +115,11 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
       <CardHeader>
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Dumbbell className="h-6 w-6 text-fitness-primary" />
-          {workoutPlan.name}
+          {plan.name}
         </CardTitle>
         <CardDescription className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
-          {workoutPlan.description}
+          {plan.description}
         </CardDescription>
         
         <div className="mt-4 flex flex-col gap-2">
@@ -98,7 +159,7 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
                 }`}
               >
                 {day.name.substring(0, 2)}
-                {day.isRestDay ? " (Ruhetag)" : ""}
+                {day.isRestDay ? " (R)" : ""}
               </span>
             ))}
           </div>
@@ -106,13 +167,13 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue={availableDays.length > 0 ? availableDays[0] : "overview"}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4 overflow-x-auto">
             {/* Overview tab for complete summary */}
-            <TabsTrigger value="overview">Übersicht</TabsTrigger>
+            <TabsTrigger value="overview" className="whitespace-nowrap">Übersicht</TabsTrigger>
             
             {/* Individual day tabs */}
             {availableDays.map((day) => (
-              <TabsTrigger key={day} value={day}>
+              <TabsTrigger key={day} value={day} className="whitespace-nowrap">
                 {day}
               </TabsTrigger>
             ))}
@@ -133,12 +194,12 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
                         <p className="text-muted-foreground">Ruhetag</p>
                       ) : (
                         <ul className="list-disc pl-4 space-y-1">
-                          {workoutPlan.days[day.name]?.slice(0, 3).map((exercise) => (
+                          {plan.days[day.name]?.slice(0, 3).map((exercise) => (
                             <li key={exercise.id} className="text-sm">{exercise.name}</li>
                           ))}
-                          {workoutPlan.days[day.name]?.length > 3 && (
+                          {plan.days[day.name]?.length > 3 && (
                             <li className="text-sm text-muted-foreground">
-                              +{workoutPlan.days[day.name].length - 3} weitere
+                              +{plan.days[day.name].length - 3} weitere
                             </li>
                           )}
                         </ul>
@@ -155,11 +216,11 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
             <TabsContent key={day} value={day}>
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">{day} Training</h3>
-                {workoutPlan.days[day]?.length === 0 ? (
+                {plan.days[day]?.length === 0 ? (
                   <p className="text-muted-foreground">Ruhetag</p>
                 ) : (
                   <div className="space-y-4">
-                    {workoutPlan.days[day]?.map((exercise) => (
+                    {plan.days[day]?.map((exercise) => (
                       <ExerciseCard key={exercise.id} exercise={exercise} />
                     ))}
                   </div>
@@ -205,7 +266,7 @@ const ExerciseCard = ({ exercise }: { exercise: Exercise }) => {
           </div>
           <Button
             variant="outline"
-            className="flex items-center gap-2 border-fitness-primary text-fitness-primary hover:bg-fitness-primary hover:text-white"
+            className="flex-shrink-0 flex items-center gap-2 border-fitness-primary text-fitness-primary hover:bg-fitness-primary hover:text-white mt-2 md:mt-0"
             onClick={openVideo}
           >
             <ExternalLink className="h-4 w-4" />
