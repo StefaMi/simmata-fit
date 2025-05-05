@@ -7,12 +7,12 @@ import { Dumbbell, User } from "lucide-react";
 type EquipmentType = 'bodyweight' | 'dumbbells' | 'barbell' | 'machine' | 'other';
 
 type EquipmentSelectorProps = {
-  onChange: (equipment: EquipmentType[]) => void;
-  initialSelection?: EquipmentType[];
+  onChange: (equipment: string[]) => void;
+  initialSelection?: string[];
 };
 
 const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelectorProps) => {
-  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType[]>([]);
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   
   useEffect(() => {
     if (initialSelection && initialSelection.length > 0) {
@@ -22,7 +22,7 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
     }
   }, [initialSelection]);
 
-  const equipmentOptions: { type: EquipmentType; label: string; icon: React.ReactNode }[] = [
+  const equipmentOptions: { type: string; label: string; icon: React.ReactNode }[] = [
     { type: 'bodyweight', label: 'Körpergewicht', icon: <User className="h-5 w-5" /> },
     { type: 'dumbbells', label: 'Hanteln', icon: <Dumbbell className="h-5 w-5" /> },
     { type: 'barbell', label: 'Langhantel', icon: <Dumbbell className="h-5 w-5 rotate-90" /> },
@@ -30,7 +30,7 @@ const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelecto
     { type: 'other', label: 'Sonstiges', icon: <Dumbbell className="h-5 w-5" /> },
   ];
 
-  const handleToggleEquipment = (type: EquipmentType) => {
+  const handleToggleEquipment = (type: string) => {
     console.log(`Toggling equipment: ${type}`);
     
     setSelectedEquipment(prev => {

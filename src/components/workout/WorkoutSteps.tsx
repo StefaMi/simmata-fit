@@ -30,6 +30,7 @@ const WorkoutSteps = ({
   };
   
   const handleSelectEquipment = (equipment: string[]) => {
+    console.log("Selected equipment:", equipment);
     onSelectEquipment(equipment);
   };
   
