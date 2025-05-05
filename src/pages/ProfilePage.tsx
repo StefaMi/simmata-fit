@@ -110,6 +110,14 @@ const ProfilePage = () => {
     isWeightLoss = profile.targetWeight < profile.currentWeight;
   }
 
+  // Get display name from user or profile
+  const displayName = user && (
+    user.firstName || 
+    (profile && profile.firstName) || 
+    user.name || 
+    user.email
+  );
+
   // Show edit form or profile info for logged in users
   return (
     <Layout>
@@ -122,7 +130,7 @@ const ProfilePage = () => {
               <CardHeader>
                 <CardTitle className="text-2xl font-bold flex items-center gap-2">
                   <User className="h-6 w-6 text-fitness-primary" />
-                  Persönliches Profil
+                  {displayName ? `${displayName}'s Profil` : "Persönliches Profil"}
                 </CardTitle>
                 <CardDescription>
                   Deine persönlichen Fitnessdaten und Ziele
@@ -130,6 +138,18 @@ const ProfilePage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {profile.firstName && (
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Vorname</h3>
+                      <p className="text-xl font-semibold">{profile.firstName}</p>
+                    </div>
+                  )}
+                  {profile.lastName && (
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Nachname</h3>
+                      <p className="text-xl font-semibold">{profile.lastName}</p>
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Alter</h3>
                     <p className="text-xl font-semibold">{profile.age} Jahre</p>

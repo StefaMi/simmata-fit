@@ -1,3 +1,4 @@
+
 // Typen für die Benutzerprofile
 export type UserProfile = {
   id: string;
@@ -8,9 +9,12 @@ export type UserProfile = {
   gender: 'male' | 'female' | 'other';
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'veryActive';
   goal: 'lose' | 'maintain' | 'gain';
-  firstName?: string; // Added firstName property
-  lastName?: string;  // Added lastName property
+  firstName?: string;
+  lastName?: string;
 };
+
+// Ernährungsvorlieben
+export type DietaryPreference = 'meat' | 'poultry' | 'fish' | 'eggs' | 'vegetarian' | 'vegan' | 'gluten_free' | 'lactose_free' | 'low_carb' | 'keto' | 'paleo';
 
 // Typen für Ernährungsdaten
 export type NutritionEntry = {
@@ -64,6 +68,7 @@ export type NutritionPlan = {
   meals: {
     [key: string]: NutritionEntry[];
   };
+  dietaryPreferences?: DietaryPreference[];
 };
 
 // Typen für Atem- & Fokus-Übungen

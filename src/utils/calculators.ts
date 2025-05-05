@@ -1,279 +1,192 @@
-import { UserProfile, BodyPart, WorkoutPlan, NutritionPlan, Exercise, NutritionEntry } from "@/types";
-import { getExercisesByBodyPart } from "@/data/exercises";
-import { getMealsByType } from "@/data/nutrition";
 
-// Berechnet den Grundumsatz (BMR) basierend auf Harris-Benedict-Gleichung
-export const calculateBMR = (profile: UserProfile): number => {
+import { UserProfile, NutritionPlan, DietaryPreference } from "@/types";
+import { v4 as uuidv4 } from "uuid";
+import { nutritionDatabase, getMealsByType } from "@/data/nutrition";
+
+// Berechnet den täglichen Kalorienbedarf basierend auf dem Profil
+export const calculateDailyCalories = (profile: UserProfile): number => {
+  // Harris-Benedict-Formel für den Grundumsatz (BMR)
+  let bmr = 0;
+  
   if (profile.gender === "male") {
-    return 88.362 + (13.397 * profile.currentWeight) + (4.799 * profile.height) - (5.677 * profile.age);
+    bmr = 88.362 + (13.397 * profile.currentWeight) + (4.799 * profile.height) - (5.677 * profile.age);
   } else {
-    return 447.593 + (9.247 * profile.currentWeight) + (3.098 * profile.height) - (4.330 * profile.age);
+    bmr = 447.593 + (9.247 * profile.currentWeight) + (3.098 * profile.height) - (4.330 * profile.age);
   }
-};
-
-// Berechnet den täglichen Kalorienbedarf
-export const calculateTDEE = (profile: UserProfile): number => {
-  const bmr = calculateBMR(profile);
   
-  // Aktivitätsfaktor
-  const activityFactors: { [key: string]: number } = {
-    sedentary: 1.2,     // Minimal oder keine Bewegung
-    light: 1.375,       // Leichte Aktivität (1-3 mal pro Woche)
-    moderate: 1.55,     // Mäßige Aktivität (3-5 mal pro Woche)
-    active: 1.725,      // Hohe Aktivität (6-7 mal pro Woche)
-    veryActive: 1.9     // Sehr hohe Aktivität (2x täglich, sehr intensiv)
+  // Multiplikator basierend auf dem Aktivitätslevel
+  const activityMultiplier = {
+    sedentary: 1.2, // Sitzende Tätigkeit mit wenig oder keiner Übung
+    light: 1.375, // Leichte Übung 1-3 Tage pro Woche
+    moderate: 1.55, // Moderate Übung 3-5 Tage pro Woche
+    active: 1.725, // Starkes Training 6-7 Tage pro Woche
+    veryActive: 1.9 // Sehr intensives Training, körperliche Arbeit oder 2x Training pro Tag
   };
   
-  return Math.round(bmr * activityFactors[profile.activityLevel]);
-};
-
-// Berechnet den Kalorienzielbedarf basierend auf dem Ziel des Nutzers
-export const calculateCalorieTarget = (profile: UserProfile): number => {
-  const tdee = calculateTDEE(profile);
+  // Täglicher Kalorienbedarf zum Gewichthalten
+  const maintenanceCalories = bmr * activityMultiplier[profile.activityLevel];
   
-  switch (profile.goal) {
-    case "lose":
-      return Math.round(tdee * 0.8); // 20% Kaloriendefizit zum Abnehmen
-    case "gain":
-      return Math.round(tdee * 1.15); // 15% Kalorienüberschuss zum Zunehmen
-    case "maintain":
-    default:
-      return tdee;
-  }
-};
-
-// Berechnet die Makronährstoffverteilung
-export const calculateMacros = (profile: UserProfile): { protein: number, carbs: number, fat: number } => {
-  const calorieTarget = calculateCalorieTarget(profile);
+  // Kalorienanpassung basierend auf dem Ziel
+  let dailyCalories = maintenanceCalories;
   
-  let protein = 0;
-  let carbs = 0;
-  let fat = 0;
-  
-  switch (profile.goal) {
-    case "lose":
-      // Höherer Proteinanteil zum Muskelerhalt während der Diät
-      protein = Math.round((calorieTarget * 0.35) / 4); // 35% Protein, 4 kcal pro Gramm
-      fat = Math.round((calorieTarget * 0.3) / 9);      // 30% Fett, 9 kcal pro Gramm
-      carbs = Math.round((calorieTarget * 0.35) / 4);   // 35% Kohlenhydrate, 4 kcal pro Gramm
-      break;
-    case "gain":
-      // Höherer Kohlenhydratanteil für Training und Muskelaufbau
-      protein = Math.round((calorieTarget * 0.3) / 4);  // 30% Protein
-      fat = Math.round((calorieTarget * 0.25) / 9);     // 25% Fett
-      carbs = Math.round((calorieTarget * 0.45) / 4);   // 45% Kohlenhydrate
-      break;
-    case "maintain":
-    default:
-      // Ausgewogene Verteilung
-      protein = Math.round((calorieTarget * 0.3) / 4);  // 30% Protein
-      fat = Math.round((calorieTarget * 0.3) / 9);      // 30% Fett
-      carbs = Math.round((calorieTarget * 0.4) / 4);    // 40% Kohlenhydrate
-      break;
+  if (profile.goal === "lose") {
+    // Kaloriendefizit für Gewichtsverlust (etwa 500 kcal pro Tag für 0,5 kg pro Woche)
+    dailyCalories = maintenanceCalories - 500;
+  } else if (profile.goal === "gain") {
+    // Kalorienüberschuss für Gewichtszunahme (etwa 300-500 kcal pro Tag)
+    dailyCalories = maintenanceCalories + 300;
   }
   
-  return { protein, carbs, fat };
+  // Runde auf eine ganze Zahl
+  return Math.round(dailyCalories);
 };
 
-// Bestimmt die optimale Trainingshäufigkeit basierend auf dem Nutzerprofil
-const determineWorkoutFrequency = (profile: UserProfile): number => {
-  switch (profile.activityLevel) {
-    case "sedentary":
-      return 3; // 3 Tage pro Woche für Anfänger
-    case "light":
-      return 4; // 4 Tage pro Woche für leicht Aktive
-    case "moderate":
-      return 5; // 5 Tage pro Woche für mäßig Aktive
-    case "active":
-    case "veryActive":
-      return 6; // 6 Tage pro Woche für sehr Aktive
-    default:
-      return 4;
-  }
-};
-
-// Erstellt einen Trainingsplan basierend auf den gewählten Körperteilen
-export const createWorkoutPlan = (bodyParts: BodyPart[], profile: UserProfile): WorkoutPlan => {
-  const workoutFrequency = determineWorkoutFrequency(profile);
-  const allExercises: Exercise[] = [];
+// Erstellt einen personalisierten Ernährungsplan basierend auf dem Profil
+export const createNutritionPlan = (
+  profile: UserProfile, 
+  dietaryPreferences: DietaryPreference[] = []
+): NutritionPlan => {
+  // Berechne täglichen Kalorienbedarf
+  const dailyCalories = calculateDailyCalories(profile);
   
-  // Übungen für jedes gewählte Körperteil sammeln
-  bodyParts.forEach(bodyPart => {
-    const bodyPartExercises = getExercisesByBodyPart(bodyPart);
-    // Nehme alle verfügbaren Übungen für diesen Körperteil
-    allExercises.push(...bodyPartExercises);
+  // Makronährstoffaufteilung basierend auf dem Ziel
+  let proteinPercentage = 0.30; // 30% Protein als Basis
+  let fatPercentage = 0.30; // 30% Fett als Basis
+  let carbsPercentage = 0.40; // 40% Kohlenhydrate als Basis
+  
+  // Passe Makronährstoff-Verhältnis basierend auf dem Ziel an
+  if (profile.goal === "lose") {
+    proteinPercentage = 0.35; // Erhöhe Protein beim Abnehmen
+    fatPercentage = 0.30;
+    carbsPercentage = 0.35; // Reduziere Kohlenhydrate beim Abnehmen
+  } else if (profile.goal === "gain") {
+    proteinPercentage = 0.30;
+    fatPercentage = 0.25; // Reduziere Fett beim Zunehmen
+    carbsPercentage = 0.45; // Erhöhe Kohlenhydrate beim Zunehmen
+  }
+  
+  // Anpassen der Makros basierend auf Ernährungsvorlieben
+  if (dietaryPreferences.includes("low_carb")) {
+    carbsPercentage = 0.25;
+    proteinPercentage = 0.35;
+    fatPercentage = 0.40;
+  }
+  
+  if (dietaryPreferences.includes("keto")) {
+    carbsPercentage = 0.1;
+    proteinPercentage = 0.3;
+    fatPercentage = 0.6;
+  }
+  
+  if (dietaryPreferences.includes("vegan") || dietaryPreferences.includes("vegetarian")) {
+    // Pflanzliche Ernährung kann etwas weniger Protein und mehr Kohlenhydrate haben
+    proteinPercentage = 0.25;
+    carbsPercentage = carbsPercentage + 0.05;
+  }
+  
+  // Berechne die Makronährstoffziele in Gramm
+  const proteinTarget = Math.round((dailyCalories * proteinPercentage) / 4); // 4 kcal pro Gramm Protein
+  const carbsTarget = Math.round((dailyCalories * carbsPercentage) / 4); // 4 kcal pro Gramm Kohlenhydrate
+  const fatTarget = Math.round((dailyCalories * fatPercentage) / 9); // 9 kcal pro Gramm Fett
+  
+  // Filter Gerichte basierend auf Ernährungsvorlieben
+  const filteredMeals = [...nutritionDatabase].filter(meal => {
+    // Wenn vegetarisch ausgewählt, keine Fleisch- oder Fischgerichte
+    if (dietaryPreferences.includes("vegetarian") && 
+        (meal.name.toLowerCase().includes("fleisch") || 
+         meal.name.toLowerCase().includes("hähnchen") || 
+         meal.name.toLowerCase().includes("fisch") ||
+         meal.name.toLowerCase().includes("lachs") ||
+         meal.name.toLowerCase().includes("thunfisch") ||
+         meal.name.toLowerCase().includes("rindfleisch"))) {
+      return false;
+    }
+    
+    // Wenn vegan ausgewählt, keine tierischen Produkte
+    if (dietaryPreferences.includes("vegan") && 
+        (meal.name.toLowerCase().includes("fleisch") || 
+         meal.name.toLowerCase().includes("hähnchen") || 
+         meal.name.toLowerCase().includes("fisch") ||
+         meal.name.toLowerCase().includes("ei") ||
+         meal.name.toLowerCase().includes("joghurt") ||
+         meal.name.toLowerCase().includes("käse") ||
+         meal.name.toLowerCase().includes("milch") ||
+         meal.name.toLowerCase().includes("lachs") ||
+         meal.name.toLowerCase().includes("thunfisch") ||
+         meal.name.toLowerCase().includes("rindfleisch"))) {
+      return false;
+    }
+    
+    return true;
   });
   
-  // Trainingstage erstellen
-  const days: { [key: string]: Exercise[] } = {};
-  const daysOfWeek = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+  // Erstelle einen personalisierten Plan basierend auf den gefilterten Gerichten
+  const breakfast = getRandomMeals(filteredMeals.filter(meal => meal.mealType === "breakfast"), 2);
+  const lunch = getRandomMeals(filteredMeals.filter(meal => meal.mealType === "lunch"), 2);
+  const dinner = getRandomMeals(filteredMeals.filter(meal => meal.mealType === "dinner"), 2);
+  const snacks = getRandomMeals(filteredMeals.filter(meal => meal.mealType === "snack"), 2);
   
-  // Berechne die Mindestanzahl von Übungen pro Tag (mindestens 3-5)
-  const totalExercises = allExercises.length;
-  const minExercisesPerDay = Math.max(3, Math.min(5, Math.ceil(totalExercises / workoutFrequency)));
+  // Erstelle den Plan
+  const plan: NutritionPlan = {
+    id: uuidv4(),
+    name: "Dein personalisierter Ernährungsplan",
+    description: getDescription(profile, dietaryPreferences),
+    dailyCalories,
+    proteinTarget,
+    carbsTarget,
+    fatTarget,
+    meals: {
+      Frühstück: breakfast,
+      Mittagessen: lunch,
+      Abendessen: dinner,
+      Snacks: snacks
+    },
+    dietaryPreferences: dietaryPreferences
+  };
   
-  // Shuffle the exercises array to get a more varied distribution
-  const shuffledExercises = [...allExercises].sort(() => Math.random() - 0.5);
+  return plan;
+};
+
+// Generiert Beschreibung basierend auf Profil und Vorlieben
+const getDescription = (profile: UserProfile, dietaryPreferences: DietaryPreference[]): string => {
+  let description = `Personalisierter ${profile.goal === "lose" ? "Abnehm" : profile.goal === "gain" ? "Aufbau" : "Erhaltungs"}plan`;
   
-  // Clear any previous days first
-  for (let i = 0; i < daysOfWeek.length; i++) {
-    days[daysOfWeek[i]] = [];
-  }
-  
-  // Distribute exercises based on body parts (grouping similar exercises)
-  // This creates a more focused workout per day, similar to Freeletics approach
-  const groupedByBodyPart: Record<BodyPart, Exercise[]> = {} as Record<BodyPart, Exercise[]>;
-  
-  bodyParts.forEach(bodyPart => {
-    groupedByBodyPart[bodyPart] = shuffledExercises.filter(ex => ex.bodyPart === bodyPart);
-  });
-  
-  // Assign body parts to specific days of the week
-  const assignedDays: Record<number, BodyPart[]> = {};
-  
-  // First, distribute primary body parts across workout days
-  let dayIndex = 0;
-  for (const bodyPart of bodyParts) {
-    if (dayIndex >= workoutFrequency) break;
+  if (dietaryPreferences.length > 0) {
+    description += " mit ";
     
-    if (!assignedDays[dayIndex]) {
-      assignedDays[dayIndex] = [];
-    }
-    
-    assignedDays[dayIndex].push(bodyPart);
-    dayIndex = (dayIndex + 1) % workoutFrequency;
-  }
-  
-  // Then add secondary assignments to ensure each workout day has enough variety
-  dayIndex = 0;
-  for (const bodyPart of bodyParts) {
-    // Skip if this would create too many exercises per day
-    if (groupedByBodyPart[bodyPart].length < 2) continue;
-    
-    // Add as secondary focus to another day
-    const secondaryDayIndex = (dayIndex + 2) % workoutFrequency;
-    if (!assignedDays[secondaryDayIndex]) {
-      assignedDays[secondaryDayIndex] = [];
-    }
-    
-    if (!assignedDays[secondaryDayIndex].includes(bodyPart)) {
-      assignedDays[secondaryDayIndex].push(bodyPart);
-    }
-    
-    dayIndex = (dayIndex + 1) % workoutFrequency;
-  }
-  
-  // Create the workouts for each active day
-  for (let i = 0; i < workoutFrequency; i++) {
-    const dayExercises: Exercise[] = [];
-    const currentDayName = daysOfWeek[i];
-    const bodyPartsForDay = assignedDays[i] || [];
-    
-    // Add exercises from each assigned body part
-    for (const bodyPart of bodyPartsForDay) {
-      const availableExercises = groupedByBodyPart[bodyPart];
+    if (dietaryPreferences.includes("vegan")) {
+      description += "veganer Ernährung";
+    } else if (dietaryPreferences.includes("vegetarian")) {
+      description += "vegetarischer Ernährung";
+    } else {
+      const prefLabels = {
+        meat: "Fleisch",
+        poultry: "Geflügel",
+        fish: "Fisch",
+        eggs: "Eiern",
+        gluten_free: "glutenfreien Optionen",
+        lactose_free: "laktosefreien Optionen",
+        low_carb: "wenig Kohlenhydraten",
+        keto: "Keto-Ansatz",
+        paleo: "Paleo-Fokus"
+      };
       
-      // Take 2-3 exercises from this body part
-      const exercisesToTake = Math.min(
-        Math.max(2, Math.ceil(minExercisesPerDay / bodyPartsForDay.length)), 
-        availableExercises.length
-      );
+      const prefsText = dietaryPreferences
+        .filter(pref => prefLabels[pref])
+        .map(pref => prefLabels[pref])
+        .join(", ");
       
-      for (let j = 0; j < exercisesToTake; j++) {
-        if (j < availableExercises.length) {
-          // Don't add duplicates
-          if (!dayExercises.find(e => e.id === availableExercises[j].id)) {
-            dayExercises.push(availableExercises[j]);
-          }
-        }
+      if (prefsText) {
+        description += prefsText;
       }
     }
-    
-    // If we still need more exercises to reach minimum, add from other body parts
-    if (dayExercises.length < minExercisesPerDay) {
-      for (const bodyPart of bodyParts) {
-        if (dayExercises.length >= minExercisesPerDay) break;
-        if (bodyPartsForDay.includes(bodyPart)) continue; // Skip already used body parts
-        
-        const availableExercises = groupedByBodyPart[bodyPart];
-        for (const exercise of availableExercises) {
-          if (dayExercises.length >= minExercisesPerDay) break;
-          if (!dayExercises.find(e => e.id === exercise.id)) {
-            dayExercises.push(exercise);
-          }
-        }
-      }
-    }
-    
-    // Assign exercises to this day if we have any
-    if (dayExercises.length > 0) {
-      days[currentDayName] = dayExercises;
-    }
   }
   
-  // Make sure rest days are clearly marked by removing the empty days from the plan
-  const finalDays: { [key: string]: Exercise[] } = {};
-  const activeDays = daysOfWeek.slice(0, workoutFrequency);
-  
-  activeDays.forEach((day, index) => {
-    if (days[day].length > 0) {
-      finalDays[day] = days[day];
-    }
-  });
-  
-  // Update the final workout plan
-  return {
-    id: "wp" + Date.now().toString(),
-    name: "Personalisierter Trainingsplan",
-    description: `Trainingsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"} (${workoutFrequency}x pro Woche)`,
-    frequency: workoutFrequency,
-    exercises: allExercises,
-    days: finalDays
-  };
+  return description;
 };
 
-// Erstellt einen Ernährungsplan basierend auf dem Nutzerprofil
-export const createNutritionPlan = (profile: UserProfile): NutritionPlan => {
-  const calorieTarget = calculateCalorieTarget(profile);
-  const macros = calculateMacros(profile);
-  
-  // Mahlzeiten aus der Datenbank abrufen
-  const breakfast = getMealsByType("breakfast");
-  const lunch = getMealsByType("lunch");
-  const dinner = getMealsByType("dinner");
-  const snacks = getMealsByType("snack");
-  
-  // Mahlzeiten auswählen, die am besten zum Kalorienziel passen
-  const selectedBreakfast = selectBestMeal(breakfast, calorieTarget * 0.25);
-  const selectedLunch = selectBestMeal(lunch, calorieTarget * 0.35);
-  const selectedDinner = selectBestMeal(dinner, calorieTarget * 0.3);
-  const selectedSnack = selectBestMeal(snacks, calorieTarget * 0.1);
-  
-  // Erstellen des Ernährungsplans
-  const meals: { [key: string]: NutritionEntry[] } = {
-    "Frühstück": [selectedBreakfast],
-    "Mittagessen": [selectedLunch],
-    "Abendessen": [selectedDinner],
-    "Snack": [selectedSnack]
-  };
-  
-  return {
-    id: "np" + Date.now().toString(),
-    name: "Personalisierter Ernährungsplan",
-    description: `Ernährungsplan für ${profile.goal === "lose" ? "Gewichtsabnahme" : profile.goal === "gain" ? "Muskelaufbau" : "Gewichtserhaltung"}`,
-    dailyCalories: calorieTarget,
-    proteinTarget: macros.protein,
-    carbsTarget: macros.carbs,
-    fatTarget: macros.fat,
-    meals: meals
-  };
-};
-
-// Wählt die Mahlzeit aus, die am besten zum Kalorienziel passt
-const selectBestMeal = (meals: NutritionEntry[], calorieTarget: number): NutritionEntry => {
-  return meals.reduce((best, current) => {
-    return Math.abs(current.calories - calorieTarget) < Math.abs(best.calories - calorieTarget)
-      ? current
-      : best;
-  }, meals[0]);
+// Hilfsfunktion um zufällige Mahlzeiten zu erhalten
+const getRandomMeals = (meals: any[], count: number) => {
+  const shuffled = [...meals].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
 };
