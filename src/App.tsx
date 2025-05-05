@@ -90,22 +90,22 @@ const AppRoutes = () => {
   );
 };
 
-function App() {
-  // Create a new QueryClient instance
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: 1,
-        refetchOnWindowFocus: false,
-      },
+// Create a stable QueryClient outside of the component tree
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
-  });
+  },
+});
 
+function App() {
   return (
     <BrowserRouter>
-      <ThemeProvider>
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <LanguageProvider>
             <AuthProvider>
               <TooltipProvider>
                 <Toaster />
@@ -113,9 +113,9 @@ function App() {
                 <AppRoutes />
               </TooltipProvider>
             </AuthProvider>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </BrowserRouter>
   );
 }

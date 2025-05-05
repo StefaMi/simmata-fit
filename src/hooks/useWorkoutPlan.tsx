@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { WorkoutPlan, UserProfile, BodyPart } from "@/types";
 import { createWorkoutPlan } from "@/utils/calculators";
@@ -94,24 +93,25 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     }
     
     try {
-      // Erstelle den Trainingsplan mit optimierten Trainingstagen
+      // Create the workout plan - this now uses our enhanced weekly plan generator
       const plan = createWorkoutPlan(bodyParts, userProfile);
       console.log("Created workout plan:", plan);
       
-      // Optimierte Trainingstage nach Frequenz
-      const optimizedPlan = optimizeWorkoutDays(plan);
-      console.log("Optimized workout plan:", optimizedPlan);
+      // We don't need to optimize the days separately anymore as our weekly generator handles this
+      // but we'll keep the optimization step for compatibility with existing code
+      const optimizedPlan = plan; // optimizeWorkoutDays is no longer needed here
+      console.log("Weekly workout plan:", optimizedPlan);
       
       if (!isMounted.current) return;
       setWorkoutPlan(optimizedPlan);
       
-      // Speichere den Plan im localStorage
+      // Save the plan to localStorage
       localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
       localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
       
       toast({
         title: "Trainingsplan erstellt",
-        description: "Dein personalisierter Trainingsplan wurde erstellt. Du kannst die Trainingshäufigkeit jederzeit anpassen.",
+        description: "Dein personalisierter Wochentrainingsplan wurde erstellt. Die Übungen wurden optimal auf die Wochentage verteilt.",
       });
       
       if (!isMounted.current) return;
