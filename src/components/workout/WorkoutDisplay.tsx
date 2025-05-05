@@ -31,6 +31,7 @@ const WorkoutDisplay = ({
     };
   }, []);
   
+  // Return early if not on step 2 or if workoutPlan is null
   if (step !== 2 || !workoutPlan) {
     return null;
   }
@@ -57,7 +58,7 @@ const WorkoutDisplay = ({
           Neuen Plan erstellen
         </Button>
       </div>
-      <WorkoutPlanDisplay workoutPlan={workoutPlan} />
+      {workoutPlan && <WorkoutPlanDisplay workoutPlan={workoutPlan} />}
       
       {userProfile && (
         <div className="mt-8">

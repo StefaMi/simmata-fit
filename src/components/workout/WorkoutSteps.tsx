@@ -5,7 +5,7 @@ import EquipmentSelector from "@/components/EquipmentSelector";
 import { BodyPart } from "@/types";
 
 type WorkoutStepsProps = {
-  step: 1 | 2;
+  step: number;
   selectedParts: BodyPart[];
   onSaveBodyParts: (bodyParts: BodyPart[]) => void;
   onSelectEquipment: (equipment: string[]) => void;
@@ -37,7 +37,7 @@ const WorkoutSteps = ({
     <div className="space-y-6">
       <BodyPartSelector 
         onSave={handleSaveBodyParts}
-        initialSelection={selectedParts} 
+        initialSelection={selectedParts || []} 
       />
       <EquipmentSelector 
         onChange={handleSelectEquipment} 

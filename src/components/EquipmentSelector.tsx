@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { Dumbbell, User } from "lucide-react";
 
@@ -13,11 +12,13 @@ type EquipmentSelectorProps = {
 };
 
 const EquipmentSelector = ({ onChange, initialSelection = [] }: EquipmentSelectorProps) => {
-  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType[]>(initialSelection);
+  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentType[]>([]);
   
   useEffect(() => {
-    if (initialSelection.length > 0) {
+    if (initialSelection && initialSelection.length > 0) {
       setSelectedEquipment(initialSelection);
+    } else {
+      setSelectedEquipment(['bodyweight', 'dumbbells']);
     }
   }, [initialSelection]);
 

@@ -89,27 +89,36 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       return;
     }
     
-    // Erstelle den Trainingsplan mit optimierten Trainingstagen
-    const plan = createWorkoutPlan(bodyParts, userProfile);
-    console.log("Created workout plan:", plan);
-    
-    // Optimierte Trainingstage nach Frequenz
-    const optimizedPlan = optimizeWorkoutDays(plan);
-    
-    if (!isMounted.current) return;
-    setWorkoutPlan(optimizedPlan);
-    
-    // Speichere den Plan im localStorage
-    localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
-    localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
-    
-    toast({
-      title: "Trainingsplan erstellt",
-      description: "Dein personalisierter Trainingsplan wurde erstellt. Du kannst die Trainingshäufigkeit jederzeit anpassen.",
-    });
-    
-    if (!isMounted.current) return;
-    setStep(2);
+    try {
+      // Erstelle den Trainingsplan mit optimierten Trainingstagen
+      const plan = createWorkoutPlan(bodyParts, userProfile);
+      console.log("Created workout plan:", plan);
+      
+      // Optimierte Trainingstage nach Frequenz
+      const optimizedPlan = optimizeWorkoutDays(plan);
+      
+      if (!isMounted.current) return;
+      setWorkoutPlan(optimizedPlan);
+      
+      // Speichere den Plan im localStorage
+      localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
+      localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
+      
+      toast({
+        title: "Trainingsplan erstellt",
+        description: "Dein personalisierter Trainingsplan wurde erstellt. Du kannst die Trainingshäufigkeit jederzeit anpassen.",
+      });
+      
+      if (!isMounted.current) return;
+      setStep(2);
+    } catch (error) {
+      console.error("Error creating workout plan:", error);
+      toast({
+        title: "Fehler",
+        description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
+        variant: "destructive",
+      });
+    }
   }, [userProfile, toast]);
 
   const handleReset = useCallback(() => {

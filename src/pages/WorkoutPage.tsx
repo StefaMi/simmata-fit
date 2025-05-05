@@ -11,20 +11,11 @@ import PreWorkoutWarning from "@/components/workout/PreWorkoutWarning";
 const WorkoutPage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [progressEntries, setProgressEntries] = useState<any[]>([]);
-  const {
-    workoutPlan,
-    selectedParts,
-    selectedEquipment,
-    step,
-    setSelectedEquipment,
-    handleSaveBodyParts,
-    handleReset
-  } = useWorkoutPlan(userProfile);
-
-  // Lade das Nutzerprofil und Fortschrittsdaten beim ersten Rendern
+  
+  // Load user profile and progress entries on mount
   useEffect(() => {
     console.log("WorkoutPage mounting, loading profile and plan");
-    // Lade das Nutzerprofil
+    // Load user profile
     const savedProfile = localStorage.getItem("userProfile");
     if (savedProfile) {
       try {
@@ -48,6 +39,16 @@ const WorkoutPage = () => {
       }
     }
   }, []);
+
+  const {
+    workoutPlan,
+    selectedParts,
+    selectedEquipment,
+    step,
+    setSelectedEquipment,
+    handleSaveBodyParts,
+    handleReset
+  } = useWorkoutPlan(userProfile);
 
   const handleProgressUpdate = (entry: any) => {
     const updatedEntries = [entry, ...progressEntries];

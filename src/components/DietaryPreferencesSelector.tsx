@@ -70,7 +70,7 @@ const DietaryPreferencesSelector = ({
   onSave,
   onCancel
 }: DietaryPreferencesSelectorProps) => {
-  const [selectedPreferences, setSelectedPreferences] = useState<DietaryPreference[]>(initialPreferences);
+  const [selectedPreferences, setSelectedPreferences] = useState<DietaryPreference[]>(initialPreferences || []);
 
   const togglePreference = (preference: DietaryPreference) => {
     if (selectedPreferences.includes(preference)) {
@@ -120,14 +120,14 @@ const DietaryPreferencesSelector = ({
           {dietaryOptions.map(option => (
             <div key={option.id} className="flex items-start space-x-3 p-3 border rounded-md hover:bg-slate-50 transition-colors">
               <Checkbox
-                id={option.id}
+                id={`dietary-${option.id}`}
                 checked={selectedPreferences.includes(option.id)}
                 onCheckedChange={() => togglePreference(option.id)}
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <option.icon className="h-5 w-5 text-fitness-primary" />
-                  <Label htmlFor={option.id} className="font-medium">
+                  <Label htmlFor={`dietary-${option.id}`} className="font-medium">
                     {option.label}
                   </Label>
                 </div>
