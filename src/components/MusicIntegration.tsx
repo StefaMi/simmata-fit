@@ -67,7 +67,8 @@ const MusicIntegration = () => {
           <TabsContent value="apple" className="space-y-4">
             <div className="text-center p-6 space-y-4">
               <div className="p-4 mx-auto bg-slate-50 dark:bg-slate-900/20 rounded-full w-16 h-16 flex items-center justify-center">
-                {getProviderIcon("apple", "h-8 w-8")}
+                {/* Fix: Removing the second argument from getProviderIcon call */}
+                {getProviderIcon("apple")}
               </div>
               <h3 className="text-lg font-semibold">Verbinde Apple Music</h3>
               <p className="text-sm text-muted-foreground">
