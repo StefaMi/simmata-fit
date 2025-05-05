@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Set up auth state listener
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (_event, session) => {
         setIsLoading(true);
@@ -124,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [isSupabaseReady, toast]);
 
+  // Auth methods
   const login = async (email: string, password: string) => {
     if (!isSupabaseReady) {
       throw new Error("Supabase ist nicht konfiguriert");
@@ -205,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return verifyUserEmail(token);
   };
 
+  // Create context value object
   const value = {
     user,
     isLoading,

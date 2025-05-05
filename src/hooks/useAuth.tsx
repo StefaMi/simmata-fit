@@ -1,7 +1,7 @@
 
-import { createContext, useContext, ReactNode } from "react";
-import { AuthProvider as AuthProviderComponent } from "@/providers/AuthProvider";
+import { createContext, useContext } from "react";
 
+// Define the type for the AuthContext
 type AuthContextType = {
   user: any;
   isLoading: boolean;
@@ -13,11 +13,11 @@ type AuthContextType = {
   isSupabaseReady: boolean;
 };
 
-// Create a context with default values
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create the AuthContext
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Export the AuthProvider component from the providers directory
-export const AuthProvider = AuthProviderComponent;
+// Export AuthProvider from the providers directory
+export { AuthProvider } from "@/providers/AuthProvider";
 
 // Custom hook to use the auth context
 export const useAuth = () => {
@@ -27,6 +27,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Export the context for use in the provider
-export { AuthContext };
