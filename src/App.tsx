@@ -21,8 +21,6 @@ import WorkoutBuilderPage from "./pages/WorkoutBuilderPage";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const queryClient = new QueryClient();
-
 // Admin mode flag for development - set to true to bypass authentication
 const ADMIN_MODE = true;
 
@@ -92,7 +90,18 @@ const AppRoutes = () => {
   );
 };
 
+// Create the QueryClient inside the component function
 const App = () => {
+  // Initialize queryClient inside the component function to ensure it's created in the React context
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 1,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
