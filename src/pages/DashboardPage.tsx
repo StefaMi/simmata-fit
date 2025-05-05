@@ -48,6 +48,11 @@ const DashboardPage = () => {
     });
   };
 
+  // Get display name from firstName and lastName, falling back to just firstName, then name, then email
+  const displayName = user?.firstName && user.lastName 
+    ? `${user.firstName} ${user.lastName}` 
+    : user?.firstName || user?.name?.split(' ')[0] || 'Fitness-Fan';
+
   const stats = [
     {
       title: "Kalorienaufnahme",
@@ -105,7 +110,7 @@ const DashboardPage = () => {
         {/* Hero-Sektion mit Begrüßung */}
         <div className="text-center space-y-4">
           <h1 className="text-3xl md:text-4xl font-bold">
-            {user ? `Hallo, ${user.firstName || user.name?.split(' ')[0] || 'Fitness-Fan'}!` : 'Dein persönlicher Fitness- und Ernährungsplan'}
+            {user ? `Hallo, ${displayName}!` : 'Dein persönlicher Fitness- und Ernährungsplan'}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Erreiche deine Gesundheits- und Fitnessziele mit maßgeschneiderten Trainings- und Ernährungsplänen.

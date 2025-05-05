@@ -30,6 +30,11 @@ const UserMenu = () => {
 
   if (!user) return null;
 
+  // Get display name from firstName and lastName, falling back to just firstName, then name, then email
+  const displayName = user.firstName && user.lastName 
+    ? `${user.firstName} ${user.lastName}` 
+    : user.firstName || user.name || user.email;
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
@@ -37,7 +42,7 @@ const UserMenu = () => {
           <User className="h-4 w-4 text-primary" />
         </div>
         <span className="text-sm font-medium hidden md:inline-block">
-          {user.name ? `Hallo, ${user.firstName || user.name}!` : user.email}
+          {`Hallo, ${displayName}!`}
         </span>
       </div>
       <Button 

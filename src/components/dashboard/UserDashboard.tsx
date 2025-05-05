@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -47,6 +46,16 @@ const UserDashboard = ({ userProfile, progressEntries, workoutPlan }: UserDashbo
   const hasTrainedThisWeek = recentWorkouts.some(session => 
     isThisWeek(new Date(session.date)));
 
+  // Get user full name for greeting
+  const userFullName = userProfile ? 
+    `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() : '';
+  
+  const greeting = userFullName ? 
+    `Hallo ${userFullName}!` :
+    userProfile?.gender === "male" ? "Hallo Sportler!" : 
+    userProfile?.gender === "female" ? "Hallo Sportlerin!" : 
+    "Hallo Sportsfreund/in!";
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -55,9 +64,7 @@ const UserDashboard = ({ userProfile, progressEntries, workoutPlan }: UserDashbo
         {userProfile && (
           <div className="flex items-center">
             <span className="font-medium mr-2">
-              Hallo {userProfile.gender === "male" ? "Sportler" : 
-                     userProfile.gender === "female" ? "Sportlerin" : 
-                     "Sportsfreund/in"}!
+              {greeting}
             </span>
             <div className="bg-fitness-primary text-white p-1 rounded-full">
               <User className="h-6 w-6" />
