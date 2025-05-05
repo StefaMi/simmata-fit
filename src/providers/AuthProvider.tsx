@@ -1,6 +1,6 @@
 
 import { useState, useEffect, ReactNode } from "react";
-import { AuthContext } from "@/contexts/AuthContext";
+import { AuthContext } from "@/hooks/useAuth";
 import { supabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { loginWithEmail, registerWithEmail, logoutUser, resetUserPassword, verifyUserEmail } from "@/utils/authUtils";

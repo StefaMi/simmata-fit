@@ -1,5 +1,5 @@
 
-import { useContext, createContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { AuthProvider as AuthProviderComponent } from "@/providers/AuthProvider";
 
 type AuthContextType = {
