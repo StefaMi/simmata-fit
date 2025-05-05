@@ -1,7 +1,258 @@
 
-import { UserProfile, NutritionPlan, DietaryPreference } from "@/types";
+import { UserProfile, NutritionPlan, DietaryPreference, WorkoutPlan, BodyPart, Exercise } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { nutritionDatabase, getMealsByType } from "@/data/nutrition";
+
+// This function was added to export createWorkoutPlan
+export const createWorkoutPlan = (bodyParts: BodyPart[], userProfile: UserProfile): WorkoutPlan => {
+  console.log("Creating workout plan for body parts:", bodyParts);
+  
+  // Create a basic workout plan structure
+  const plan: WorkoutPlan = {
+    id: uuidv4(),
+    name: "Dein personalisierter Trainingsplan",
+    description: `Trainingsplan für ${userProfile.firstName || ''} mit Fokus auf ${bodyParts.join(', ')}`,
+    frequency: 3, // Default to 3 times per week
+    exercises: [],
+    days: {
+      "Montag": [],
+      "Dienstag": [],
+      "Mittwoch": [],
+      "Donnerstag": [],
+      "Freitag": [],
+      "Samstag": [],
+      "Sonntag": []
+    }
+  };
+  
+  // Default exercises for each body part
+  const exercisesByBodyPart: Record<BodyPart, Exercise[]> = {
+    chest: [
+      {
+        id: uuidv4(),
+        name: "Liegestütze",
+        bodyPart: "chest",
+        description: "Standard Liegestütze für die Brustmuskeln",
+        videoUrl: "https://www.youtube.com/watch?v=IODxDxX7oi4",
+        sets: 3,
+        reps: 12,
+        restTime: 60,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Bankdrücken",
+        bodyPart: "chest",
+        description: "Klassisches Bankdrücken mit Langhantel",
+        videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg",
+        sets: 4,
+        reps: 8,
+        restTime: 90,
+        equipmentType: "barbell"
+      }
+    ],
+    back: [
+      {
+        id: uuidv4(),
+        name: "Klimmzüge",
+        bodyPart: "back",
+        description: "Grundübung für den Rücken",
+        videoUrl: "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+        sets: 3,
+        reps: 8,
+        restTime: 90,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Rudern vorgebeugt",
+        bodyPart: "back",
+        description: "Vorgebeugtes Rudern mit Langhantel",
+        videoUrl: "https://www.youtube.com/watch?v=kBWAon7ItDw",
+        sets: 4,
+        reps: 10,
+        restTime: 60,
+        equipmentType: "barbell"
+      }
+    ],
+    legs: [
+      {
+        id: uuidv4(),
+        name: "Kniebeugen",
+        bodyPart: "legs",
+        description: "Klassische Kniebeugen für die Beine",
+        videoUrl: "https://www.youtube.com/watch?v=ultWZbUMPL8",
+        sets: 4,
+        reps: 10,
+        restTime: 90,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Ausfallschritte",
+        bodyPart: "legs",
+        description: "Ausfallschritte für Beine und Po",
+        videoUrl: "https://www.youtube.com/watch?v=QOVaHwm-Q6U",
+        sets: 3,
+        reps: 12,
+        restTime: 60,
+        equipmentType: "bodyweight"
+      }
+    ],
+    shoulders: [
+      {
+        id: uuidv4(),
+        name: "Schulterdrücken",
+        bodyPart: "shoulders",
+        description: "Schulterdrücken mit Kurzhanteln",
+        videoUrl: "https://www.youtube.com/watch?v=qEwKCR5JCog",
+        sets: 3,
+        reps: 10,
+        restTime: 60,
+        equipmentType: "dumbbells"
+      },
+      {
+        id: uuidv4(),
+        name: "Seitheben",
+        bodyPart: "shoulders",
+        description: "Seitheben mit Kurzhanteln für die Schultern",
+        videoUrl: "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+        sets: 3,
+        reps: 12,
+        restTime: 45,
+        equipmentType: "dumbbells"
+      }
+    ],
+    biceps: [
+      {
+        id: uuidv4(),
+        name: "Bizeps Curls",
+        bodyPart: "biceps",
+        description: "Klassische Bizeps Curls mit Kurzhanteln",
+        videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+        sets: 3,
+        reps: 12,
+        restTime: 60,
+        equipmentType: "dumbbells"
+      },
+      {
+        id: uuidv4(),
+        name: "Hammercurls",
+        bodyPart: "biceps",
+        description: "Hammercurls für Bizeps und Unterarme",
+        videoUrl: "https://www.youtube.com/watch?v=zC3nLlEvin4",
+        sets: 3,
+        reps: 10,
+        restTime: 45,
+        equipmentType: "dumbbells"
+      }
+    ],
+    triceps: [
+      {
+        id: uuidv4(),
+        name: "Dips",
+        bodyPart: "triceps",
+        description: "Dips für den Trizeps",
+        videoUrl: "https://www.youtube.com/watch?v=6kALZikXxLc",
+        sets: 3,
+        reps: 10,
+        restTime: 60,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Trizepsdrücken",
+        bodyPart: "triceps",
+        description: "Trizepsdrücken am Kabelzug",
+        videoUrl: "https://www.youtube.com/watch?v=2-LAMcpzODU",
+        sets: 3,
+        reps: 12,
+        restTime: 45,
+        equipmentType: "machine"
+      }
+    ],
+    abs: [
+      {
+        id: uuidv4(),
+        name: "Crunches",
+        bodyPart: "abs",
+        description: "Klassische Crunches für die Bauchmuskeln",
+        videoUrl: "https://www.youtube.com/watch?v=Xyd_fa5zoEU",
+        sets: 3,
+        reps: 15,
+        restTime: 45,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Plank",
+        bodyPart: "abs",
+        description: "Unterarmstütz für die Körpermitte",
+        videoUrl: "https://www.youtube.com/watch?v=pSHjTRCQxIw",
+        sets: 3,
+        reps: 30,
+        restTime: 45,
+        equipmentType: "bodyweight"
+      }
+    ],
+    cardio: [
+      {
+        id: uuidv4(),
+        name: "Laufen",
+        bodyPart: "cardio",
+        description: "Laufen für die Ausdauer",
+        videoUrl: "https://www.youtube.com/watch?v=kje8U4gVjUY",
+        sets: 1,
+        reps: 20,
+        restTime: 0,
+        equipmentType: "bodyweight"
+      },
+      {
+        id: uuidv4(),
+        name: "Burpees",
+        bodyPart: "cardio",
+        description: "Burpees für Kraft und Ausdauer",
+        videoUrl: "https://www.youtube.com/watch?v=tJrdJBWBu40",
+        sets: 3,
+        reps: 10,
+        restTime: 30,
+        equipmentType: "bodyweight"
+      }
+    ]
+  };
+  
+  // Add exercises to the plan based on selected body parts
+  let allExercises: Exercise[] = [];
+  bodyParts.forEach(bodyPart => {
+    const exercisesForPart = exercisesByBodyPart[bodyPart] || [];
+    allExercises = [...allExercises, ...exercisesForPart];
+  });
+  
+  // Sort exercises to ensure primary muscle groups are trained first
+  allExercises.sort((a, b) => {
+    // Prioritize compound exercises over isolation
+    const compoundFirst = ["chest", "back", "legs"].indexOf(a.bodyPart) - 
+                         ["chest", "back", "legs"].indexOf(b.bodyPart);
+    return compoundFirst;
+  });
+  
+  plan.exercises = allExercises;
+  
+  // Basic distribution: Split exercises over 3 days
+  const weekDays = ["Montag", "Mittwoch", "Freitag"];
+  let dayIndex = 0;
+  
+  allExercises.forEach(exercise => {
+    const day = weekDays[dayIndex % weekDays.length];
+    if (!plan.days[day]) {
+      plan.days[day] = [];
+    }
+    plan.days[day].push(exercise);
+    dayIndex++;
+  });
+  
+  return plan;
+};
 
 // Berechnet den täglichen Kalorienbedarf basierend auf dem Profil
 export const calculateDailyCalories = (profile: UserProfile): number => {

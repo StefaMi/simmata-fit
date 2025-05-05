@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import NutritionForm from "@/components/NutritionForm";
 import NutritionPlanDisplay from "@/components/NutritionPlanDisplay";
@@ -8,7 +7,7 @@ import { createNutritionPlan } from "@/utils/calculators";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, RefreshCw, Plus, Heart, Meat, Fish, Carrot, Apple } from "lucide-react";
+import { ArrowLeft, RefreshCw, Plus, Heart, Beef, Fish, Carrot, Apple } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import DietaryPreferencesSelector from "@/components/DietaryPreferencesSelector";
 
@@ -191,7 +190,7 @@ const NutritionPage = () => {
                   <div className="flex flex-col md:flex-row gap-4 items-center">
                     <div className="flex flex-col items-center md:items-start gap-2 flex-1">
                       <div className="flex gap-2 items-center">
-                        <Meat className="h-5 w-5 text-fitness-primary" />
+                        <Beef className="h-5 w-5 text-fitness-primary" />
                         <span>Fleisch</span>
                       </div>
                       <div className="flex gap-2 items-center">

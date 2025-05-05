@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { DietaryPreference } from "@/types";
-import { Meat, Fish, Egg, Carrot, Apple, Utensils, ChefHat } from "lucide-react";
+import { Beef, Fish, Egg, Carrot, Apple, Utensils, ChefHat } from "lucide-react";
 
 type DietaryPreferenceOption = {
   id: DietaryPreference;
@@ -18,7 +18,7 @@ const dietaryOptions: DietaryPreferenceOption[] = [
   {
     id: "meat",
     label: "Fleisch",
-    icon: Meat,
+    icon: Beef,
     description: "Rindfleisch, Schweinefleisch, Lamm, etc."
   },
   {
