@@ -13,7 +13,14 @@ export const loginWithEmail = async (email: string, password: string) => {
 };
 
 // Helper function for registration
-export const registerWithEmail = async (email: string, password: string) => {
+export const registerWithEmail = async (
+  email: string, 
+  password: string, 
+  metadata?: { 
+    first_name?: string;
+    last_name?: string;
+  }
+) => {
   // First check if the email exists already
   const { data: existingUsers, error: checkError } = await supabaseClient
     .from('profiles')
@@ -36,6 +43,7 @@ export const registerWithEmail = async (email: string, password: string) => {
     password,
     options: {
       emailRedirectTo: `${window.location.origin}/verify-email`,
+      data: metadata
     },
   });
   
@@ -53,6 +61,25 @@ export const registerWithEmail = async (email: string, password: string) => {
   // If user is already registered
   if (data?.user?.identities && data.user.identities.length === 0) {
     throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
+  }
+  
+  // If registration was successful and we have metadata, store in user_profiles
+  if (data?.user && metadata) {
+    try {
+      const { error: profileError } = await supabaseClient
+        .from('user_profiles')
+        .upsert({
+          id: data.user.id,
+          first_name: metadata.first_name,
+          last_name: metadata.last_name,
+        });
+        
+      if (profileError) {
+        console.error("Error creating user profile:", profileError);
+      }
+    } catch (profileErr) {
+      console.error("Error creating user profile:", profileErr);
+    }
   }
   
   return data;

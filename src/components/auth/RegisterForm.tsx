@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Eye, EyeOff } from "lucide-react";
+import { Mail, Eye, EyeOff, User } from "lucide-react";
 
 import {
   Form,
@@ -19,6 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
 const registerSchema = z.object({
+  firstName: z.string().min(1, { message: "Vorname ist erforderlich." }),
+  lastName: z.string().min(1, { message: "Nachname ist erforderlich." }),
   email: z.string().email({ message: "Ungültige Email-Adresse." }),
   password: z.string().min(6, { message: "Passwort muss mindestens 6 Zeichen haben." }),
   confirmPassword: z.string().min(6, { message: "Passwort muss mindestens 6 Zeichen haben." }),
@@ -45,6 +47,8 @@ const RegisterForm = ({ onSuccess, onToggleForm }: RegisterFormProps) => {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -66,7 +70,11 @@ const RegisterForm = ({ onSuccess, onToggleForm }: RegisterFormProps) => {
     
     try {
       console.log("Starting registration with:", data.email);
-      const result = await register(data.email, data.password);
+      // Pass first and last name as metadata
+      const result = await register(data.email, data.password, {
+        first_name: data.firstName,
+        last_name: data.lastName
+      });
       console.log("Registration result:", result);
       
       // Since registration was successful, show success message
@@ -94,6 +102,43 @@ const RegisterForm = ({ onSuccess, onToggleForm }: RegisterFormProps) => {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vorname</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Max" 
+                      {...field} 
+                      disabled={isLoading || !isSupabaseReady}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nachname</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Mustermann" 
+                      {...field} 
+                      disabled={isLoading || !isSupabaseReady}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="email"
@@ -185,7 +230,7 @@ const RegisterForm = ({ onSuccess, onToggleForm }: RegisterFormProps) => {
             className="w-full" 
             disabled={isLoading || !isSupabaseReady}
           >
-            <Mail className="mr-2 h-4 w-4" />
+            <User className="mr-2 h-4 w-4" />
             Registrieren
           </Button>
         </form>

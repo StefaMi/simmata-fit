@@ -9,6 +9,8 @@ type AuthUser = {
   email: string;
   id: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   isVerified?: boolean;
 } | null;
 
@@ -37,13 +39,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setIsLoading(true);
         if (session?.user) {
+          // Get user profile data if available
+          let firstName = "";
+          let lastName = "";
+          
+          try {
+            const { data: profiles } = await supabaseClient
+              .from('user_profiles')
+              .select('first_name, last_name')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (profiles) {
+              firstName = profiles.first_name || "";
+              lastName = profiles.last_name || "";
+            }
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+          }
+
           setUser({
             id: session.user.id,
             email: session.user.email || "",
             isVerified: session.user.email_confirmed_at ? true : false,
+            firstName,
+            lastName,
+            name: firstName ? `${firstName} ${lastName}`.trim() : session.user.email
           });
         } else {
           setUser(null);
@@ -58,10 +82,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) {
+          // Get user profile data if available
+          let firstName = "";
+          let lastName = "";
+          
+          try {
+            const { data: profiles } = await supabaseClient
+              .from('user_profiles')
+              .select('first_name, last_name')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (profiles) {
+              firstName = profiles.first_name || "";
+              lastName = profiles.last_name || "";
+            }
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+          }
+
           setUser({
             id: session.user.id,
             email: session.user.email || "",
             isVerified: session.user.email_confirmed_at ? true : false,
+            firstName,
+            lastName,
+            name: firstName ? `${firstName} ${lastName}`.trim() : session.user.email
           });
         }
       } catch (error) {
@@ -94,7 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, metadata?: {
+    first_name?: string;
+    last_name?: string;
+  }) => {
     if (!isSupabaseReady) {
       throw new Error("Supabase ist nicht konfiguriert");
     }
@@ -104,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Log the registration attempt for debugging
       console.log("Attempting to register user with email:", email);
       
-      const data = await registerWithEmail(email, password);
+      const data = await registerWithEmail(email, password, metadata);
       console.log("Registration response:", data);
       
       return data;

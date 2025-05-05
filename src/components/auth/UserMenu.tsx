@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const UserMenu = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -16,6 +18,7 @@ const UserMenu = () => {
         title: "Erfolgreich abgemeldet",
         description: "Auf Wiedersehen!",
       });
+      navigate("/");
     } catch (error) {
       toast({
         title: "Fehler beim Abmelden",
@@ -34,7 +37,7 @@ const UserMenu = () => {
           <User className="h-4 w-4 text-primary" />
         </div>
         <span className="text-sm font-medium hidden md:inline-block">
-          {user.name || user.email}
+          {user.name ? `Hallo, ${user.firstName || user.name}!` : user.email}
         </span>
       </div>
       <Button 
