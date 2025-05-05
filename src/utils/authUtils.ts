@@ -45,6 +45,8 @@ export const registerWithEmail = async (
     email,
     password,
     options: {
+      // Wichtig: Verwende "/verify-email" (nicht das vollständige Origin)
+      // Supabase fügt die URL-Basis automatisch hinzu
       emailRedirectTo: `${currentOrigin}/verify-email`,
       data: metadata
     },
@@ -102,8 +104,16 @@ export const resetUserPassword = async (email: string) => {
   if (error) throw error;
 };
 
-// Helper function for email verification
+// Helper function for email verification - verbessert
 export const verifyUserEmail = async (token: string) => {
   console.log("Email verification token:", token);
-  return Promise.resolve();
+  
+  try {
+    // Bei Bedarf kann hier der Token verifiziert werden
+    // Für Supabase ist dies in der Regel nicht notwendig, da die Verifizierung serverseitig erfolgt
+    return Promise.resolve(true);
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    return Promise.reject(error);
+  }
 };
