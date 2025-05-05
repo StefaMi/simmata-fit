@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type UserProfileFormProps = {
   onSave: (profile: UserProfile) => void;
@@ -16,6 +20,8 @@ type UserProfileFormProps = {
 
 const UserProfileForm = ({ onSave, initialProfile }: UserProfileFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile>(
     initialProfile || {
       id: "user1",
@@ -39,6 +45,16 @@ const UserProfileForm = ({ onSave, initialProfile }: UserProfileFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if user is logged in
+    if (!user) {
+      toast({
+        title: "Registrierung erforderlich",
+        description: "Bitte registriere dich oder melde dich an, um fortzufahren.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Validierung
     if (
       !profile.age ||
@@ -54,11 +70,20 @@ const UserProfileForm = ({ onSave, initialProfile }: UserProfileFormProps) => {
       return;
     }
 
+    // Update the profile with the user's first and last name if available
+    if (user.firstName || user.lastName) {
+      profile.firstName = user.firstName;
+      profile.lastName = user.lastName;
+    }
+
     onSave(profile);
     toast({
       title: "Profil gespeichert",
       description: "Deine persönlichen Daten wurden erfolgreich gespeichert.",
     });
+    
+    // Automatically navigate to workout page
+    navigate("/workout");
   };
 
   return (
@@ -70,6 +95,15 @@ const UserProfileForm = ({ onSave, initialProfile }: UserProfileFormProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {!user && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Du musst dich anmelden oder registrieren, bevor du dein Profil erstellen kannst.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -189,8 +223,12 @@ const UserProfileForm = ({ onSave, initialProfile }: UserProfileFormProps) => {
             </Select>
           </div>
 
-          <Button type="submit" className="w-full fitness-gradient">
-            Speichern und Fortfahren
+          <Button 
+            type="submit" 
+            className="w-full fitness-gradient"
+            disabled={!user}
+          >
+            {user ? "Speichern und zum Training" : "Bitte zuerst anmelden"}
           </Button>
         </form>
       </CardContent>
