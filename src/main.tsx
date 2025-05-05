@@ -1,12 +1,12 @@
 
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { StrictMode } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from './App.tsx';
 import './index.css';
 import { registerServiceWorker } from './registerSW';
 
-// Create a client instance - properly initialized before rendering React components
+// Create a client instance outside of the render function
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -22,11 +22,11 @@ const rootElement = document.getElementById("root");
 if (rootElement) {
   const root = createRoot(rootElement);
   root.render(
-    <StrictMode>
+    <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
-    </StrictMode>
+    </React.StrictMode>
   );
 }
 
