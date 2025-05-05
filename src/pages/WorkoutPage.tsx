@@ -64,10 +64,12 @@ const WorkoutPage = () => {
   } = useWorkoutPlan(userProfile);
 
   const handleProgressUpdate = useCallback((entry: any) => {
-    const updatedEntries = [entry, ...progressEntries];
-    setProgressEntries(updatedEntries);
-    localStorage.setItem("progressEntries", JSON.stringify(updatedEntries));
-  }, [progressEntries]);
+    setProgressEntries(prevEntries => {
+      const updatedEntries = [entry, ...prevEntries];
+      localStorage.setItem("progressEntries", JSON.stringify(updatedEntries));
+      return updatedEntries;
+    });
+  }, []);
 
   console.log("Current step:", step, "Workout plan exists:", !!workoutPlan);
   const isLoading = isProfileLoading || isPlanLoading;

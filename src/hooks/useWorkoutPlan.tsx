@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { WorkoutPlan, UserProfile, BodyPart } from "@/types";
 import { createWorkoutPlan } from "@/utils/calculators";
@@ -24,10 +25,13 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
 
   // Load saved workout plan on mount
   useEffect(() => {
+    // Load saved data only if the component is mounted
+    if (!isMounted.current) return;
+    
     const savedWorkoutPlan = localStorage.getItem("workoutPlan");
     const savedBodyParts = localStorage.getItem("selectedBodyParts");
     
-    if (savedBodyParts && isMounted.current) {
+    if (savedBodyParts) {
       try {
         const parts = JSON.parse(savedBodyParts);
         console.log("Loaded saved body parts:", parts);
@@ -37,7 +41,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       }
     }
     
-    if (savedWorkoutPlan && isMounted.current) {
+    if (savedWorkoutPlan) {
       try {
         const plan = JSON.parse(savedWorkoutPlan);
         console.log("Loaded saved workout plan:", plan);
@@ -93,20 +97,16 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     }
     
     try {
-      // Create the workout plan - this now uses our enhanced weekly plan generator
+      // Create the workout plan
       const plan = createWorkoutPlan(bodyParts, userProfile);
       console.log("Created workout plan:", plan);
       
-      // We don't need to optimize the days separately anymore as our weekly generator handles this
-      // but we'll keep the optimization step for compatibility with existing code
-      const optimizedPlan = plan; // optimizeWorkoutDays is no longer needed here
-      console.log("Weekly workout plan:", optimizedPlan);
-      
+      // Ensure we don't update state if the component unmounted
       if (!isMounted.current) return;
-      setWorkoutPlan(optimizedPlan);
+      setWorkoutPlan(plan);
       
       // Save the plan to localStorage
-      localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
+      localStorage.setItem("workoutPlan", JSON.stringify(plan));
       localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
       
       toast({
@@ -118,11 +118,13 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       setStep(2);
     } catch (error) {
       console.error("Error creating workout plan:", error);
-      toast({
-        title: "Fehler",
-        description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
-        variant: "destructive",
-      });
+      if (isMounted.current) {
+        toast({
+          title: "Fehler",
+          description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
+          variant: "destructive",
+        });
+      }
     } finally {
       if (isMounted.current) setIsLoading(false);
     }

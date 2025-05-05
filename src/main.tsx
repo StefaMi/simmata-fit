@@ -6,7 +6,7 @@ import App from './App.tsx';
 import './index.css';
 import { registerServiceWorker } from './registerSW';
 
-// Create a client instance - properly initialized before render
+// Create a client instance - properly initialized before rendering React components
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

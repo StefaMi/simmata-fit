@@ -37,13 +37,13 @@ const WorkoutDisplay = ({
   }
 
   const handleReset = () => {
-    if (!isMounted.current) return;
     onReset();
   };
   
   const handleProgressUpdate = (entry: any) => {
-    if (!isMounted.current) return;
-    onProgressUpdate(entry);
+    if (isMounted.current) {
+      onProgressUpdate(entry);
+    }
   };
 
   return (
@@ -58,6 +58,7 @@ const WorkoutDisplay = ({
           Neuen Plan erstellen
         </Button>
       </div>
+      
       {workoutPlan && <WorkoutPlanDisplay workoutPlan={workoutPlan} />}
       
       {userProfile && (

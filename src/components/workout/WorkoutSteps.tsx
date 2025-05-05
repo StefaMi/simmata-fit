@@ -38,7 +38,7 @@ const WorkoutSteps = ({
     <div className="space-y-6">
       <BodyPartSelector 
         onSave={handleSaveBodyParts}
-        initialSelection={selectedParts || []} 
+        initialSelection={selectedParts} 
       />
       <EquipmentSelector 
         onChange={handleSelectEquipment} 
