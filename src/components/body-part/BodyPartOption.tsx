@@ -14,11 +14,14 @@ type BodyPartOptionProps = {
 
 const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOptionProps) => {
   // Handler for click on the entire component
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent default to stop any navigation
+    e.preventDefault();
+    e.stopPropagation();
     onToggle(value);
   };
 
-  // Handle checkbox change separately to avoid event propagation issues
+  // Handle checkbox change separately
   const handleCheckboxChange = (checked: boolean | "indeterminate") => {
     if (checked !== "indeterminate") {
       onToggle(value);
@@ -38,21 +41,19 @@ const BodyPartOption = ({ value, label, icon, isSelected, onToggle }: BodyPartOp
         <div className="flex items-center justify-center h-12 w-12 rounded-full bg-fitness-primary bg-opacity-10 dark:bg-fitness-primary/20">
           {icon}
         </div>
-        <div className="text-center">
-          <Label
-            htmlFor={`bodypart-${value}`}
-            className="text-sm font-medium cursor-pointer dark:text-gray-200"
-          >
-            {label}
-          </Label>
-        </div>
+        <Label
+          htmlFor={`bodypart-${value}`}
+          className="text-sm font-medium cursor-pointer dark:text-gray-200"
+        >
+          {label}
+        </Label>
         <div className="flex items-center justify-center">
           <Checkbox
             id={`bodypart-${value}`}
             checked={isSelected}
             className="data-[state=checked]:bg-fitness-primary data-[state=checked]:text-white"
             onCheckedChange={handleCheckboxChange}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // This prevents the click from triggering the card's onClick
           />
         </div>
       </div>

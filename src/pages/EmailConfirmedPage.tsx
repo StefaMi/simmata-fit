@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,19 @@ import { Check } from "lucide-react";
 
 const EmailConfirmedPage = () => {
   const navigate = useNavigate();
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Automatically redirect to login page after 5 seconds
-    const redirectTimer = setTimeout(() => {
+    // Using a ref to store the timer ID ensures we can clean it up properly
+    timerRef.current = window.setTimeout(() => {
       navigate("/login");
     }, 5000);
 
-    // Cleanup function to prevent memory leaks
+    // Clean up function that uses the ref
     return () => {
-      clearTimeout(redirectTimer);
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, [navigate]);
 
