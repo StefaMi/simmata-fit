@@ -1,4 +1,3 @@
-
 // Typen für die Benutzerprofile
 export type UserProfile = {
   id: string;
@@ -9,6 +8,8 @@ export type UserProfile = {
   gender: 'male' | 'female' | 'other';
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'veryActive';
   goal: 'lose' | 'maintain' | 'gain';
+  firstName?: string; // Added firstName property
+  lastName?: string;  // Added lastName property
 };
 
 // Typen für Ernährungsdaten
