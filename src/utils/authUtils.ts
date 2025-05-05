@@ -37,12 +37,15 @@ export const registerWithEmail = async (
     throw new Error("Diese Email ist bereits registriert. Bitte melden Sie sich an oder verwenden Sie eine andere Email-Adresse.");
   }
   
+  // Get the current origin, which will work in both development and production
+  const currentOrigin = window.location.origin;
+  
   // Proceed with registration
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${window.location.origin}/verify-email`,
+      emailRedirectTo: `${currentOrigin}/verify-email`,
       data: metadata
     },
   });
