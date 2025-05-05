@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,9 +52,7 @@ const FocusExercises = ({ onComplete }: FocusExercisesProps) => {
 
   const handleExerciseComplete = () => {
     setSelectedExercise(null);
-    if (onComplete) {
-      onComplete();
-    }
+    if (onComplete) onComplete();
   };
 
   const filteredExercises = focusExercises.filter(
@@ -111,36 +108,36 @@ const FocusExercises = ({ onComplete }: FocusExercisesProps) => {
               {getTabIcon("nesma")} Nesma
             </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value={activeTab} className="mt-4">
-  {filteredExercises.length === 0 ? (
-    <div className="text-sm text-muted-foreground">
-      Für diese Kategorie sind aktuell keine Übungen verfügbar.
-    </div>
-  ) : (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {filteredExercises.map((exercise) => (
-        <Card key={exercise.id} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-1">{exercise.name}</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              {exercise.description}
-            </p>
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-muted-foreground">
-                {Math.floor(exercise.duration / 60)}:{(exercise.duration % 60).toString().padStart(2, '0')} Min
-              </span>
-              <Button size="sm" onClick={() => setSelectedExercise(exercise)}>
-                Starten
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )}
-</TabsContent>
 
+          <TabsContent value={activeTab} className="mt-4">
+            {filteredExercises.length === 0 ? (
+              <div className="text-sm text-muted-foreground">
+                Für diese Kategorie sind derzeit keine Übungen verfügbar.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {filteredExercises.map((exercise) => (
+                  <Card key={exercise.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold mb-1">{exercise.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {exercise.description}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground">
+                          {Math.floor(exercise.duration / 60)}:
+                          {(exercise.duration % 60).toString().padStart(2, "0")} Min
+                        </span>
+                        <Button size="sm" onClick={() => setSelectedExercise(exercise)}>
+                          Starten
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
