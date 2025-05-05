@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import UserProfileForm from "@/components/UserProfileForm";
 import { UserProfile } from "@/types";
@@ -91,6 +92,22 @@ const ProfilePage = () => {
         </div>
       </Layout>
     );
+  }
+
+  // Calculate values for profile display
+  let bmi = 0;
+  let bmiCategory = "";
+  let isWeightLoss = false;
+  let weightDifference = 0;
+  
+  if (profile) {
+    // Calculate BMI
+    bmi = calculateBMI(profile.currentWeight, profile.height);
+    bmiCategory = getBMICategory(bmi);
+    
+    // Calculate weight difference and determine if it's weight loss
+    weightDifference = Math.abs(profile.targetWeight - profile.currentWeight);
+    isWeightLoss = profile.targetWeight < profile.currentWeight;
   }
 
   // Show edit form or profile info for logged in users
