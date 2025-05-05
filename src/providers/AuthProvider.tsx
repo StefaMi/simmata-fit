@@ -2,7 +2,7 @@
 import { useState, useEffect, ReactNode } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { supabaseClient, isSupabaseConfigured } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { loginWithEmail, registerWithEmail, logoutUser, resetUserPassword, verifyUserEmail } from "@/utils/authUtils";
 
 type AuthUser = {
