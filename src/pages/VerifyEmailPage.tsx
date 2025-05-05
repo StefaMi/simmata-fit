@@ -38,6 +38,14 @@ const VerifyEmailPage = () => {
           return;
         }
         
+        // Check if this is a redirect after successful verification
+        // This happens when a user comes back to verify-email after clicking the link
+        if (location.pathname === "/verify-email" && !location.search) {
+          // Regular page load, show verification instructions
+          console.log("Regular page load, showing verification instructions");
+          return;
+        }
+        
         // Check authentication status
         const { data: { session } } = await supabaseClient.auth.getSession();
         
@@ -63,18 +71,9 @@ const VerifyEmailPage = () => {
             console.log("Token found in URL:", token);
             
             // For Supabase, verification is automatic when clicking the link
-            // We just need to inform the user that the process is complete
+            // Redirect to email-confirmed page
             setVerificationStatus("success");
-            
-            toast({
-              title: "E-Mail-Prüfung abgeschlossen",
-              description: "Bitte melde dich jetzt an, um fortzufahren.",
-            });
-            
-            // Redirect to login page after short delay
-            setTimeout(() => {
-              navigate("/login", { replace: true });
-            }, 3000);
+            navigate("/email-confirmed", { replace: true });
           } else {
             // No session and no token - just show verification instructions
             console.log("No token found in URL and user not authenticated");

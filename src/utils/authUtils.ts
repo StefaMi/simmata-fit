@@ -45,8 +45,8 @@ export const registerWithEmail = async (
     email,
     password,
     options: {
-      // Use the specific verify-email page path
-      emailRedirectTo: `${currentOrigin}/verify-email`,
+      // Use the email-confirmed page for successful verification
+      emailRedirectTo: `${currentOrigin}/email-confirmed`,
       data: metadata
     },
   });
@@ -103,7 +103,7 @@ export const resetUserPassword = async (email: string) => {
   if (error) throw error;
 };
 
-// Helper function for email verification - verbessert
+// Helper function for email verification
 export const verifyUserEmail = async (token: string) => {
   console.log("Email verification token:", token);
   

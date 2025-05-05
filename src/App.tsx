@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import EmailConfirmedPage from "./pages/EmailConfirmedPage";
 import ProfilePage from "./pages/ProfilePage";
 import WorkoutPage from "./pages/WorkoutPage";
 import NutritionPage from "./pages/NutritionPage";
@@ -75,6 +76,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
