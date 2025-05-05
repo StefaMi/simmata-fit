@@ -24,6 +24,16 @@ import { ThemeProvider } from "@/components/theme-provider";
 // Admin mode flag for development - set to true to bypass authentication
 const ADMIN_MODE = true;
 
+// Create a stable QueryClient instance outside of the component
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -90,22 +100,11 @@ const AppRoutes = () => {
   );
 };
 
-// Create the QueryClient inside the component function
 const App = () => {
-  // Initialize queryClient inside the component function to ensure it's created in the React context
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: 1,
-        refetchOnWindowFocus: false,
-      },
-    },
-  });
-
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <LanguageProvider>
           <ThemeProvider>
             <TooltipProvider>
               <Toaster />
@@ -115,8 +114,8 @@ const App = () => {
               </BrowserRouter>
             </TooltipProvider>
           </ThemeProvider>
-        </AuthProvider>
-      </LanguageProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
