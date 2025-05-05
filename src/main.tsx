@@ -6,7 +6,7 @@ import App from './App.tsx';
 import './index.css';
 import { registerServiceWorker } from './registerSW';
 
-// Create a stable QueryClient instance outside of the component tree
+// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Render the React application with proper provider hierarchy
+// Render the React application
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
