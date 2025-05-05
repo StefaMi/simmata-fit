@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, User } from "lucide-react";
+import { LogIn, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const UserMenu = () => {
@@ -28,7 +28,20 @@ const UserMenu = () => {
     }
   };
 
-  if (!user) return null;
+  // If user is not logged in, show login button
+  if (!user) {
+    return (
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={() => navigate("/login")}
+        className="flex items-center gap-2"
+      >
+        <LogIn className="h-4 w-4" />
+        <span className="hidden sm:inline">Anmelden</span>
+      </Button>
+    );
+  }
 
   // Get display name from firstName and lastName, falling back to just firstName, then name, then email
   const displayName = user.firstName && user.lastName 
