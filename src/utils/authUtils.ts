@@ -45,8 +45,7 @@ export const registerWithEmail = async (
     email,
     password,
     options: {
-      // Wichtig: Verwende "/verify-email" (nicht das vollständige Origin)
-      // Supabase fügt die URL-Basis automatisch hinzu
+      // Use the specific verify-email page path
       emailRedirectTo: `${currentOrigin}/verify-email`,
       data: metadata
     },
