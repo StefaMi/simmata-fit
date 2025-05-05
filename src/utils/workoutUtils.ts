@@ -40,6 +40,9 @@ export const optimizeWorkoutDays = (plan: WorkoutPlan): WorkoutPlan => {
   // Sammle alle Übungen aus dem ursprünglichen Plan
   const allExercises = Object.values(plan.days).flat();
   
+  console.log("Total exercises to distribute:", allExercises.length);
+  console.log("Optimal days:", optimalDays);
+  
   // Übungen gleichmäßig auf die Trainingstage verteilen
   if (allExercises.length > 0 && optimalDays.length > 0) {
     // Sortiere Übungen nach Körperteilen für bessere Gruppierung
@@ -48,12 +51,18 @@ export const optimizeWorkoutDays = (plan: WorkoutPlan): WorkoutPlan => {
     // Berechne, wie viele Übungen pro Tag
     const exercisesPerDay = Math.ceil(allExercises.length / optimalDays.length);
     
+    console.log("Exercises per day:", exercisesPerDay);
+    
     // Verteile die Übungen
     optimalDays.forEach((day, index) => {
       const startIdx = index * exercisesPerDay;
       const endIdx = Math.min(startIdx + exercisesPerDay, allExercises.length);
+      console.log(`Day ${day}: Assigning exercises from ${startIdx} to ${endIdx}`);
+      
       if (startIdx < allExercises.length) {
-        newDays[day] = allExercises.slice(startIdx, endIdx);
+        const exercisesForDay = allExercises.slice(startIdx, endIdx);
+        newDays[day] = JSON.parse(JSON.stringify(exercisesForDay)); // Tiefe Kopie erstellen
+        console.log(`Assigned ${exercisesForDay.length} exercises to ${day}`);
       }
     });
   }
@@ -66,9 +75,13 @@ export const optimizeWorkoutDays = (plan: WorkoutPlan): WorkoutPlan => {
   } (${frequency}x pro Woche)`;
   
   // Erstelle aktualisierten Plan
-  return {
+  const optimizedPlan = {
     ...plan,
     description: updatedDescription,
     days: newDays
   };
+  
+  console.log("Optimized plan:", JSON.stringify(optimizedPlan, null, 2));
+  
+  return optimizedPlan;
 };

@@ -12,14 +12,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 const WorkoutPage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [progressEntries, setProgressEntries] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   
   // Load user profile and progress entries on mount
   useEffect(() => {
     console.log("WorkoutPage mounting, loading profile and plan");
     
     const loadData = async () => {
-      setIsLoading(true);
+      setIsProfileLoading(true);
       try {
         // Load user profile
         const savedProfile = localStorage.getItem("userProfile");
@@ -45,7 +45,7 @@ const WorkoutPage = () => {
           }
         }
       } finally {
-        setIsLoading(false);
+        setIsProfileLoading(false);
       }
     };
     
@@ -57,6 +57,7 @@ const WorkoutPage = () => {
     selectedParts,
     selectedEquipment,
     step,
+    isLoading: isPlanLoading,
     setSelectedEquipment,
     handleSaveBodyParts,
     handleReset
@@ -69,6 +70,7 @@ const WorkoutPage = () => {
   }, [progressEntries]);
 
   console.log("Current step:", step, "Workout plan exists:", !!workoutPlan);
+  const isLoading = isProfileLoading || isPlanLoading;
 
   return (
     <Layout>

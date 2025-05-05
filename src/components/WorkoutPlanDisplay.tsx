@@ -7,6 +7,7 @@ import { Dumbbell, ExternalLink, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { optimizeWorkoutDays } from "@/utils/workoutUtils";
 
 type WorkoutPlanDisplayProps = {
   workoutPlan: WorkoutPlan;
@@ -16,11 +17,27 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
   const [frequency, setFrequency] = useState<number>(workoutPlan.frequency);
   const [plan, setPlan] = useState<WorkoutPlan>(workoutPlan);
   
-  // Map of optimal training days based on frequency
-  const getOptimalTrainingDays = (freq: number): string[] => {
+  // Update plan when frequency changes
+  useEffect(() => {
+    if (frequency !== workoutPlan.frequency) {
+      // Create a copy of the workout plan with new frequency
+      const updatedPlan = { ...workoutPlan, frequency };
+      
+      // Use the optimizeWorkoutDays utility to redistribute exercises
+      const optimizedPlan = optimizeWorkoutDays(updatedPlan);
+      
+      setPlan(optimizedPlan);
+      
+      // Save updated plan to localStorage
+      localStorage.setItem("workoutPlan", JSON.stringify(optimizedPlan));
+    }
+  }, [frequency, workoutPlan]);
+  
+  // Get the optimal days for the current frequency
+  const optimalDays = (() => {
     const allDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
     
-    switch(freq) {
+    switch(frequency) {
       case 2:
         return ["Montag", "Donnerstag"];
       case 3:
@@ -32,73 +49,9 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
       case 6:
         return ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
       default:
-        return allDays.slice(0, freq);
+        return allDays.slice(0, frequency);
     }
-  };
-  
-  // Update plan when frequency changes
-  useEffect(() => {
-    if (frequency !== workoutPlan.frequency) {
-      // Create a copy of the workout plan
-      const updatedPlan = { ...workoutPlan, frequency };
-      
-      // Get the optimal days for the new frequency
-      const optimalDays = getOptimalTrainingDays(frequency);
-      
-      // Collect all exercises from the original plan
-      const allExercises = Object.values(workoutPlan.days).flat();
-      
-      // Create new days object
-      const newDays: { [key: string]: Exercise[] } = {};
-      const allDays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-      
-      // Initialize all days with empty arrays
-      allDays.forEach(day => {
-        newDays[day] = [];
-      });
-      
-      // Redistribute exercises to optimal days
-      if (allExercises.length > 0) {
-        // Sort exercises by body part for better grouping
-        const sortedExercises = [...allExercises].sort((a, b) => 
-          a.bodyPart.localeCompare(b.bodyPart));
-        
-        // Calculate exercises per day
-        const exercisesPerDay = Math.ceil(sortedExercises.length / optimalDays.length);
-        
-        // Distribute exercises
-        optimalDays.forEach((day, index) => {
-          const startIdx = index * exercisesPerDay;
-          const endIdx = Math.min(startIdx + exercisesPerDay, sortedExercises.length);
-          if (startIdx < sortedExercises.length) {
-            newDays[day] = sortedExercises.slice(startIdx, endIdx);
-          }
-        });
-      }
-      
-      // Update description
-      const updatedDescription = `Trainingsplan für ${
-        workoutPlan.description.includes("Gewichtsabnahme") ? "Gewichtsabnahme" : 
-        workoutPlan.description.includes("Muskelaufbau") ? "Muskelaufbau" : 
-        "Gewichtserhaltung"
-      } (${frequency}x pro Woche)`;
-      
-      // Create updated plan
-      const updatedPlanWithDays = {
-        ...updatedPlan,
-        description: updatedDescription,
-        days: newDays
-      };
-      
-      setPlan(updatedPlanWithDays);
-      
-      // Save updated plan to localStorage
-      localStorage.setItem("workoutPlan", JSON.stringify(updatedPlanWithDays));
-    }
-  }, [frequency, workoutPlan]);
-  
-  // Get the optimal days for the current frequency
-  const optimalDays = getOptimalTrainingDays(frequency);
+  })();
   
   // Available days will be ordered according to the week
   const weekdayOrder = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
@@ -109,6 +62,15 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
     name: day,
     isRestDay: !availableDays.includes(day)
   }));
+
+  // Check if a day has exercises (non-empty)
+  const dayHasExercises = (day: string): boolean => {
+    return Array.isArray(plan.days[day]) && plan.days[day].length > 0;
+  };
+
+  // Count how many days actually have exercises
+  const daysWithExercises = availableDays.filter(day => dayHasExercises(day));
+  console.log("Days with exercises:", daysWithExercises);
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -167,7 +129,7 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue={availableDays.length > 0 ? availableDays[0] : "overview"}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4 overflow-x-auto">
+          <TabsList className="flex flex-wrap mb-4 overflow-x-auto">
             {/* Overview tab for complete summary */}
             <TabsTrigger value="overview" className="whitespace-nowrap">Übersicht</TabsTrigger>
             
@@ -190,7 +152,7 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
                       <CardTitle className="text-md">{day.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="py-2">
-                      {day.isRestDay ? (
+                      {!dayHasExercises(day.name) ? (
                         <p className="text-muted-foreground">Ruhetag</p>
                       ) : (
                         <ul className="list-disc pl-4 space-y-1">
@@ -216,7 +178,7 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
             <TabsContent key={day} value={day}>
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">{day} Training</h3>
-                {plan.days[day]?.length === 0 ? (
+                {!dayHasExercises(day) ? (
                   <p className="text-muted-foreground">Ruhetag</p>
                 ) : (
                   <div className="space-y-4">

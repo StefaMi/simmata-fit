@@ -11,6 +11,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
   const [selectedParts, setSelectedParts] = useState<BodyPart[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>(['bodyweight', 'dumbbells']);
   const [step, setStep] = useState<1 | 2>(1);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Add a mounted ref to prevent state updates after unmount
   const isMounted = useRef(true);
@@ -68,10 +69,12 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     console.log("handleSaveBodyParts called with:", bodyParts);
     
     if (!isMounted.current) return;
+    setIsLoading(true);
     setSelectedParts(bodyParts);
     
     if (!userProfile) {
       console.log("No user profile available, showing toast warning");
+      setIsLoading(false);
       toast({
         title: "Profil fehlt",
         description: "Bitte erstelle zuerst dein persönliches Profil.",
@@ -81,6 +84,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     }
     
     if (bodyParts.length === 0) {
+      setIsLoading(false);
       toast({
         title: "Keine Körperteile ausgewählt",
         description: "Bitte wähle mindestens ein Körperteil aus.",
@@ -119,6 +123,8 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
         description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
         variant: "destructive",
       });
+    } finally {
+      if (isMounted.current) setIsLoading(false);
     }
   }, [userProfile, toast]);
 
@@ -136,6 +142,7 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     selectedParts,
     selectedEquipment,
     step,
+    isLoading,
     setSelectedEquipment,
     handleSaveBodyParts,
     handleReset
