@@ -14,7 +14,6 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
-      suspense: false, // Don't use React Suspense yet
     },
   },
 });
