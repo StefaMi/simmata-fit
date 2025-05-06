@@ -20,14 +20,13 @@ const queryClient = new QueryClient({
 // Ensure DOM is fully loaded before rendering
 const renderApp = () => {
   const rootElement = document.getElementById("root");
+  
   if (rootElement) {
     const root = createRoot(rootElement);
     root.render(
-      <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     );
   }
 };

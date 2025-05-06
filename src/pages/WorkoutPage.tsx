@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "@/components/Layout";
 import DailyQuote from "@/components/DailyQuote";
 import { UserProfile } from "@/types";
@@ -14,16 +14,24 @@ const WorkoutPage = () => {
   const [progressEntries, setProgressEntries] = useState<any[]>([]);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   
-  // Load user profile and progress entries on mount
+  // Component mounted ref to prevent state updates after unmount
+  const isMounted = useRef(true);
+  
   useEffect(() => {
+    // Set the mounted flag to true when component mounts
+    isMounted.current = true;
+    
+    // Load user profile and progress entries on mount
     console.log("WorkoutPage mounting, loading profile and plan");
     
     const loadData = async () => {
+      if (!isMounted.current) return;
+      
       setIsProfileLoading(true);
       try {
         // Load user profile
         const savedProfile = localStorage.getItem("userProfile");
-        if (savedProfile) {
+        if (savedProfile && isMounted.current) {
           try {
             const profile = JSON.parse(savedProfile);
             console.log("Loaded user profile:", profile);
@@ -37,7 +45,7 @@ const WorkoutPage = () => {
         
         // Load progress entries
         const savedEntries = localStorage.getItem("progressEntries");
-        if (savedEntries) {
+        if (savedEntries && isMounted.current) {
           try {
             setProgressEntries(JSON.parse(savedEntries));
           } catch (error) {
@@ -45,11 +53,19 @@ const WorkoutPage = () => {
           }
         }
       } finally {
-        setIsProfileLoading(false);
+        if (isMounted.current) {
+          setIsProfileLoading(false);
+        }
       }
     };
     
     loadData();
+    
+    // Cleanup when component unmounts
+    return () => {
+      isMounted.current = false;
+      console.log("WorkoutPage unmounting");
+    };
   }, []);
 
   const {
@@ -64,6 +80,8 @@ const WorkoutPage = () => {
   } = useWorkoutPlan(userProfile);
 
   const handleProgressUpdate = useCallback((entry: any) => {
+    if (!isMounted.current) return;
+    
     setProgressEntries(prevEntries => {
       const updatedEntries = [entry, ...prevEntries];
       localStorage.setItem("progressEntries", JSON.stringify(updatedEntries));

@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
+import { Link } from "react-router-dom";
 
 type PreWorkoutWarningProps = {
   userProfile: UserProfile | null;
@@ -22,7 +23,7 @@ const PreWorkoutWarning = ({ userProfile, step }: PreWorkoutWarningProps) => {
           </p>
           <p className="mt-3">
             <Button asChild variant="outline">
-              <a href="/profile">Zum Profil</a>
+              <Link to="/profile">Zum Profil</Link>
             </Button>
           </p>
         </div>

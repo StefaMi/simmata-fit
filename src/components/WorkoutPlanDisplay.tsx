@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Exercise, WorkoutPlan } from "@/types";
 import { Dumbbell, ExternalLink, Calendar } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { optimizeWorkoutDays } from "@/utils/workoutUtils";
@@ -16,10 +16,18 @@ type WorkoutPlanDisplayProps = {
 const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
   const [frequency, setFrequency] = useState<number>(workoutPlan.frequency);
   const [plan, setPlan] = useState<WorkoutPlan>(workoutPlan);
+  const isMounted = useRef(true);
+  
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
   
   // Update plan when frequency changes
   useEffect(() => {
-    if (frequency !== workoutPlan.frequency) {
+    if (frequency !== workoutPlan.frequency && isMounted.current) {
       // Create a copy of the workout plan with new frequency
       const updatedPlan = { ...workoutPlan, frequency };
       
@@ -88,7 +96,11 @@ const WorkoutPlanDisplay = ({ workoutPlan }: WorkoutPlanDisplayProps) => {
           <Label htmlFor="frequency-select">Trainingshäufigkeit anpassen:</Label>
           <Select 
             value={String(frequency)} 
-            onValueChange={(value) => setFrequency(Number(value))}
+            onValueChange={(value) => {
+              if (isMounted.current) {
+                setFrequency(Number(value));
+              }
+            }}
           >
             <SelectTrigger id="frequency-select" className="w-full sm:w-[180px]">
               <SelectValue placeholder="Wähle Trainingshäufigkeit" />

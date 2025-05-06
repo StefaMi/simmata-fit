@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import BodyPartSelector from "@/components/body-part/BodyPartSelector";
 import EquipmentSelector from "@/components/EquipmentSelector";
 import { BodyPart } from "@/types";
@@ -17,6 +17,15 @@ const WorkoutSteps = ({
   onSaveBodyParts, 
   onSelectEquipment 
 }: WorkoutStepsProps) => {
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  
   console.log("WorkoutSteps rendered", { step, selectedParts });
   
   // Only render if we're on step 1

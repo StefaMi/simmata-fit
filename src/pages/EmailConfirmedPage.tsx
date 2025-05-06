@@ -9,8 +9,11 @@ import { Check } from "lucide-react";
 const EmailConfirmedPage = () => {
   const navigate = useNavigate();
   const timerRef = useRef<number | null>(null);
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
+    
     // Clear any existing timer first
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
@@ -19,11 +22,14 @@ const EmailConfirmedPage = () => {
     // Set a new timer
     timerRef.current = window.setTimeout(() => {
       timerRef.current = null; // Clear the reference
-      navigate("/login");
+      if (isMounted.current) {
+        navigate("/login");
+      }
     }, 5000);
 
     // Clean up function
     return () => {
+      isMounted.current = false;
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
         timerRef.current = null;

@@ -18,7 +18,10 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
   
   useEffect(() => {
     // Set up the mounted ref
+    isMounted.current = true;
+    
     return () => {
+      // Cleanup on unmount
       isMounted.current = false;
     };
   }, []);
@@ -35,7 +38,9 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       try {
         const parts = JSON.parse(savedBodyParts);
         console.log("Loaded saved body parts:", parts);
-        setSelectedParts(parts);
+        if (isMounted.current) {
+          setSelectedParts(parts);
+        }
       } catch (error) {
         console.error("Error parsing saved body parts:", error);
       }
@@ -45,8 +50,10 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       try {
         const plan = JSON.parse(savedWorkoutPlan);
         console.log("Loaded saved workout plan:", plan);
-        setWorkoutPlan(plan);
-        setStep(2); // Show the plan
+        if (isMounted.current) {
+          setWorkoutPlan(plan);
+          setStep(2); // Show the plan
+        }
       } catch (error) {
         console.error("Fehler beim Parsen des gespeicherten Trainingsplans:", error);
       }
@@ -55,14 +62,14 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
 
   // Watch for changes to the workout plan and save to localStorage
   useEffect(() => {
-    if (workoutPlan) {
+    if (workoutPlan && isMounted.current) {
       localStorage.setItem("workoutPlan", JSON.stringify(workoutPlan));
     }
   }, [workoutPlan]);
 
   // Save selected body parts to localStorage when they change
   useEffect(() => {
-    if (selectedParts.length > 0) {
+    if (selectedParts.length > 0 && isMounted.current) {
       localStorage.setItem("selectedBodyParts", JSON.stringify(selectedParts));
     }
   }, [selectedParts]);
@@ -77,22 +84,26 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
     
     if (!userProfile) {
       console.log("No user profile available, showing toast warning");
-      setIsLoading(false);
-      toast({
-        title: "Profil fehlt",
-        description: "Bitte erstelle zuerst dein persönliches Profil.",
-        variant: "destructive",
-      });
+      if (isMounted.current) {
+        setIsLoading(false);
+        toast({
+          title: "Profil fehlt",
+          description: "Bitte erstelle zuerst dein persönliches Profil.",
+          variant: "destructive",
+        });
+      }
       return;
     }
     
     if (bodyParts.length === 0) {
-      setIsLoading(false);
-      toast({
-        title: "Keine Körperteile ausgewählt",
-        description: "Bitte wähle mindestens ein Körperteil aus.",
-        variant: "destructive",
-      });
+      if (isMounted.current) {
+        setIsLoading(false);
+        toast({
+          title: "Keine Körperteile ausgewählt",
+          description: "Bitte wähle mindestens ein Körperteil aus.",
+          variant: "destructive",
+        });
+      }
       return;
     }
     
@@ -109,24 +120,27 @@ export const useWorkoutPlan = (userProfile: UserProfile | null) => {
       localStorage.setItem("workoutPlan", JSON.stringify(plan));
       localStorage.setItem("selectedBodyParts", JSON.stringify(bodyParts));
       
-      toast({
-        title: "Trainingsplan erstellt",
-        description: "Dein personalisierter Wochentrainingsplan wurde erstellt. Die Übungen wurden optimal auf die Wochentage verteilt.",
-      });
+      if (isMounted.current) {
+        toast({
+          title: "Trainingsplan erstellt",
+          description: "Dein personalisierter Wochentrainingsplan wurde erstellt. Die Übungen wurden optimal auf die Wochentage verteilt.",
+        });
+      }
       
-      if (!isMounted.current) return;
-      setStep(2);
+      if (isMounted.current) {
+        setStep(2);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error("Error creating workout plan:", error);
       if (isMounted.current) {
+        setIsLoading(false);
         toast({
           title: "Fehler",
           description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
           variant: "destructive",
         });
       }
-    } finally {
-      if (isMounted.current) setIsLoading(false);
     }
   }, [userProfile, toast]);
 
