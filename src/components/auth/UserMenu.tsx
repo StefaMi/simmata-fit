@@ -5,9 +5,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const UserMenu = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,6 +29,15 @@ const UserMenu = () => {
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-4">
+        <Skeleton className="w-36 h-8 rounded-md" />
+      </div>
+    );
+  }
+
   // If user is not logged in, show login button
   if (!user) {
     return (
@@ -43,10 +53,10 @@ const UserMenu = () => {
     );
   }
 
-  // Get display name from firstName and lastName, falling back to just firstName, then name, then email
+  // Get display name prioritizing firstName and lastName, falling back to other options
   const displayName = user.firstName && user.lastName 
     ? `${user.firstName} ${user.lastName}` 
-    : user.firstName || user.name || user.email;
+    : user.firstName || user.lastName || user.name || user.email;
 
   return (
     <div className="flex items-center gap-4">
