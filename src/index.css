@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 210 100% 98%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 199 89% 48%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 142.1 76.2% 36.3%;  /* Fitness-Grün */
+    --primary-foreground: 355.7 100% 97.3%;
 
-    --secondary: 199 89% 39%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 142.1 70% 45%;  /* Helles Fitness-Grün */
+    --secondary-foreground: 355.7 100% 97.3%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 199 84% 59%;
+    --accent: 142.1 76.2% 36.3%;  /* Fitness-Akzent */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,31 +31,42 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 199 89% 39%;
+    --ring: 142.1 76.2% 36.3%; /* Fitness-Ring */
 
     --radius: 0.75rem;
+    
+    /* Fitness-Spezifische Farben */
+    --fitness-primary: 142.1 76.2% 36.3%;
+    --fitness-secondary: 142.1 70% 45%;
+    --fitness-accent: 142.1 65% 50%;
+    --fitness-success: 142.1 76.2% 36.3%;
+    --fitness-warning: 38 92% 50%;
+    --fitness-error: 0 84.2% 60.2%;
+    --fitness-background: 220 26% 14%;
+    --fitness-card: 222 20% 18%;
+    --fitness-text: 0 0% 98%;
   }
 
   .dark {
-    --background: 222.2 47.4% 11.2%;
+    --background: 220 26% 14%;
     --foreground: 210 40% 98%;
     
-    --card: 222.2 47.4% 11.2%;
+    --card: 222 20% 18%;
     --card-foreground: 210 40% 98%;
     
-    --popover: 222.2 47.4% 11.2%;
+    --popover: 222 20% 18%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 199 89% 48%;
+    --primary: 142.1 76.2% 46.3%;
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 199 89% 39%;
+    --secondary: 142.1 70% 40%;
     --secondary-foreground: 210 40% 98%;
     
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     
-    --accent: 199 84% 59%;
+    --accent: 142.1 65% 50%;
     --accent-foreground: 210 40% 98%;
     
     --destructive: 0 62.8% 30.6%;
@@ -63,7 +74,7 @@
     
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 142.1 76.2% 46.3%;
   }
 }
 
@@ -79,27 +90,65 @@
 }
 
 .fitness-gradient {
-  @apply bg-gradient-to-r from-fitness-primary to-fitness-secondary dark:from-fitness-accent dark:to-fitness-primary;
+  @apply bg-gradient-to-r from-[#4ade80] to-[#22c55e] dark:from-[#4ade80] dark:to-[#22c55e];
 }
 
 /* Modern Card Styles */
 .modern-card {
-  @apply backdrop-blur-md bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl;
+  @apply backdrop-blur-md bg-card border border-slate-200 dark:border-slate-700/30 shadow-xl rounded-xl;
 }
 
 /* Glassmorphism Effect */
 .glass-card {
-  @apply backdrop-blur-lg bg-white/50 dark:bg-slate-900/50 border border-white/20 dark:border-slate-700/20 shadow-xl rounded-xl;
+  @apply backdrop-blur-lg bg-white/10 dark:bg-slate-900/20 border border-white/20 dark:border-slate-700/20 shadow-xl rounded-xl;
+}
+
+/* Activity Card - Apple Fitness+ Style */
+.activity-card {
+  @apply backdrop-blur-sm bg-card/80 dark:bg-card/60 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-lg overflow-hidden;
 }
 
 /* Glowing effect on hover */
 .glow-on-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:shadow-fitness-primary/20 dark:hover:shadow-fitness-accent/20;
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20;
 }
 
 /* Text gradient */
 .text-gradient {
-  @apply bg-gradient-to-r from-fitness-primary to-fitness-accent bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+}
+
+/* Bottom Tab Navigation */
+.tab-bar {
+  @apply fixed bottom-0 left-0 right-0 flex items-center justify-around bg-card/80 dark:bg-card/80 backdrop-blur-md border-t border-slate-200/50 dark:border-slate-700/50 py-2 px-1 z-50;
+}
+
+.tab-item {
+  @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200;
+}
+
+.tab-item.active {
+  @apply text-primary;
+}
+
+/* Progress Ring Styles */
+.progress-ring-container {
+  @apply relative flex items-center justify-center;
+}
+
+.progress-ring-background {
+  @apply absolute inset-0 rounded-full border-4 border-muted/30;
+}
+
+.progress-ring-progress {
+  @apply absolute inset-0 rounded-full border-4 border-primary;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+/* Fitness Stat Box */
+.fitness-stat-box {
+  @apply flex flex-col items-center justify-center p-4 rounded-2xl bg-card/80 dark:bg-card/60 border border-slate-200/50 dark:border-slate-700/50 shadow-md;
 }
 
 /* Animations */
@@ -112,23 +161,13 @@
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Dark mode styling */
-.dark .checkbox-icon {
-  @apply text-white;
+/* Activity Selection Card */
+.activity-selection-card {
+  @apply rounded-xl border-2 border-slate-200/50 dark:border-slate-700/50 p-4 flex flex-col items-center justify-center transition-all cursor-pointer;
 }
 
-.dark .card {
-  @apply bg-gray-800 border-gray-700;
-}
-
-.dark .input,
-.dark .select,
-.dark .textarea {
-  @apply bg-gray-700 border-gray-600 text-white;
-}
-
-html.dark {
-  color-scheme: dark;
+.activity-selection-card.selected {
+  @apply border-primary/80 bg-primary/10;
 }
 
 /* Modern scrollbar */
@@ -147,4 +186,25 @@ html.dark {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-slate-400 dark:bg-slate-500;
+}
+
+/* IOS-like component styles */
+.ios-switch {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300 dark:bg-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+}
+
+.ios-switch[data-state="checked"] {
+  @apply bg-primary;
+}
+
+.ios-switch-thumb {
+  @apply block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0;
+}
+
+.ios-button {
+  @apply rounded-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 shadow-sm transition-all;
+}
+
+.ios-workout-item {
+  @apply bg-card/80 dark:bg-card/60 rounded-2xl p-4 flex items-center gap-4 border border-slate-200/50 dark:border-slate-700/50;
 }

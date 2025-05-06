@@ -16,7 +16,6 @@ import WorkoutPage from "./pages/WorkoutPage";
 import NutritionPage from "./pages/NutritionPage";
 import FocusPage from "./pages/FocusPage"; 
 import ProgressPage from "./pages/ProgressPage";
-import DashboardPage from "./pages/DashboardPage";
 import WorkoutBuilderPage from "./pages/WorkoutBuilderPage";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -30,8 +29,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="animate-pulse text-fitness-primary dark:text-fitness-accent font-bold">Lädt...</div>
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-background to-card">
+        <div className="animate-pulse text-primary font-bold">Lädt...</div>
       </div>
     );
   }
@@ -46,8 +45,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Separate AppRoutes to prevent hook logic issues
 const AppRoutes = () => {
-  const { user } = useAuth();
-
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
     document.body.classList.add("mobile-app");
@@ -94,7 +91,7 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
       <BrowserRouter>
         <LanguageProvider>
           <AuthProvider>
