@@ -1,3 +1,4 @@
+
 import { UserProfile, NutritionPlan, DietaryPreference, WorkoutPlan, BodyPart, Exercise } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { nutritionDatabase, getMealsByType } from "@/data/nutrition";
@@ -7,8 +8,8 @@ import { generateWeeklyWorkoutPlan } from "@/utils/weeklyPlanGenerator";
 export const createWorkoutPlan = (selectedBodyParts: BodyPart[], userProfile: UserProfile): WorkoutPlan => {
   console.log("Creating workout plan for:", selectedBodyParts, userProfile);
   
-  // Default to 5 days per week if not specified
-  const frequency = userProfile.workoutFrequency || 5;
+  // Use a default frequency since workoutFrequency doesn't exist in UserProfile
+  const frequency = 5; // Default to 5 days per week
   
   // Generate the workout plan using the weekly plan generator
   const workoutPlan = generateWeeklyWorkoutPlan(selectedBodyParts, userProfile, frequency);
