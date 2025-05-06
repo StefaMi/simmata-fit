@@ -1,14 +1,21 @@
 import { UserProfile, NutritionPlan, DietaryPreference, WorkoutPlan, BodyPart, Exercise } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { nutritionDatabase, getMealsByType } from "@/data/nutrition";
-import { generateWeeklyWorkoutPlan } from "./weeklyPlanGenerator";
+import { generateWeeklyWorkoutPlan } from "@/utils/weeklyPlanGenerator";
 
 // This function was added to export createWorkoutPlan and now includes our weekly plan generator
-export const createWorkoutPlan = (bodyParts: BodyPart[], userProfile: UserProfile): WorkoutPlan => {
-  console.log("Creating workout plan for body parts:", bodyParts);
+export const createWorkoutPlan = (selectedBodyParts: BodyPart[], userProfile: UserProfile): WorkoutPlan => {
+  console.log("Creating workout plan for:", selectedBodyParts, userProfile);
   
-  // Use the new weekly plan generator for better exercise distribution
-  return generateWeeklyWorkoutPlan(bodyParts, userProfile);
+  // Default to 5 days per week if not specified
+  const frequency = userProfile.workoutFrequency || 5;
+  
+  // Generate the workout plan using the weekly plan generator
+  const workoutPlan = generateWeeklyWorkoutPlan(selectedBodyParts, userProfile, frequency);
+  
+  console.log("Generated workout plan:", workoutPlan);
+  
+  return workoutPlan;
 };
 
 // Berechnet den täglichen Kalorienbedarf basierend auf dem Profil

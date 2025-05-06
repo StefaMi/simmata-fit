@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { ChevronDown, Search } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { useNavigate } from "react-router-dom";
 
 // Activity Card Component
 const ActivityCard = ({ 
@@ -73,6 +74,7 @@ const CategoryCard = ({
 
 const WorkoutPage = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulate data loading
@@ -83,9 +85,13 @@ const WorkoutPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleCreatePlan = () => {
+    navigate("/workout-builder");
+  };
+
   if (isLoading) {
     return (
-      <Layout hideNav={false} showHeader={true} title="Fitness+">
+      <Layout hideNav={false} showHeader={true} title="Rush">
         <div className="flex h-[80vh] w-full items-center justify-center">
           <LoadingSpinner size="lg" text="Wird geladen..." />
         </div>
@@ -94,7 +100,7 @@ const WorkoutPage = () => {
   }
 
   return (
-    <Layout hideNav={false} showHeader={true} title="Fitness+">
+    <Layout hideNav={false} showHeader={true} title="Rush">
       <div className="space-y-8">
         {/* Search Bar */}
         <div className="apple-search">
@@ -111,7 +117,10 @@ const WorkoutPage = () => {
             <p className="text-muted-foreground mt-2 mb-4">
               Wähl deine Aktivitäten und leg Zeiten fest, um Woche für Woche motiviert zu bleiben.
             </p>
-            <Button className="fitness-plus-button w-full">
+            <Button 
+              className="fitness-plus-button w-full"
+              onClick={handleCreatePlan}
+            >
               Plan gestalten
             </Button>
           </div>
@@ -151,7 +160,7 @@ const WorkoutPage = () => {
           <div className="activity-card p-6">
             <h3 className="text-lg font-medium">Bleibe am Ball und hole dir neue Auszeichnungen.</h3>
             <div className="mt-4 border border-slate-800 rounded-lg p-4">
-              <h4 className="font-medium">Wöchentliche "Fitness+"-Trainingsserie</h4>
+              <h4 className="font-medium">Wöchentliche "Rush"-Trainingsserie</h4>
               <p className="text-muted-foreground text-sm mt-1">Aktuelle Serie • 0 Wochen</p>
             </div>
           </div>

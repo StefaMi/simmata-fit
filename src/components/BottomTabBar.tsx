@@ -15,7 +15,7 @@ const BottomTabBar = () => {
       activeColor: "#b1fc31"
     },
     {
-      name: "Fitness+",
+      name: "Rush",
       path: "/workout",
       icon: Dumbbell,
       activeColor: "#b1fc31"

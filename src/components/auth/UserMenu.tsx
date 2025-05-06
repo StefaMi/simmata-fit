@@ -82,7 +82,7 @@ const UserMenu = () => {
           <span>Account</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/workout")}>
-          <span>Fitness+</span>
+          <span>Rush</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
