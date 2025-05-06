@@ -5,76 +5,51 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 26% 7%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 222 20% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 222 20% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 142.1 76.2% 36.3%;  /* Fitness-Grün */
-    --primary-foreground: 355.7 100% 97.3%;
+    --primary: 142.1 76.2% 56.3%;  /* Helleres Fitness-Grün */
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 142.1 70% 45%;  /* Helles Fitness-Grün */
-    --secondary-foreground: 355.7 100% 97.3%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 142.1 76.2% 36.3%;  /* Fitness-Akzent */
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 142.1 65% 50%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 142.1 76.2% 36.3%; /* Fitness-Ring */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142.1 76.2% 46.3%;
 
     --radius: 0.75rem;
     
     /* Fitness-Spezifische Farben */
-    --fitness-primary: 142.1 76.2% 36.3%;
+    --fitness-primary: 85 80% 56%;  /* Fitness+ Grün (#b1fc31) */
     --fitness-secondary: 142.1 70% 45%;
     --fitness-accent: 142.1 65% 50%;
     --fitness-success: 142.1 76.2% 36.3%;
     --fitness-warning: 38 92% 50%;
     --fitness-error: 0 84.2% 60.2%;
-    --fitness-background: 220 26% 14%;
-    --fitness-card: 222 20% 18%;
+    --fitness-background: 220 26% 7%;
+    --fitness-card: 222 20% 12%;
     --fitness-text: 0 0% 98%;
   }
 
-  .dark {
-    --background: 220 26% 14%;
-    --foreground: 210 40% 98%;
-    
-    --card: 222 20% 18%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222 20% 18%;
-    --popover-foreground: 210 40% 98%;
-    
-    --primary: 142.1 76.2% 46.3%;
-    --primary-foreground: 210 40% 98%;
-    
-    --secondary: 142.1 70% 40%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 142.1 65% 50%;
-    --accent-foreground: 210 40% 98%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 76.2% 46.3%;
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
@@ -85,27 +60,31 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
+/* Apple-style fitness gradients */
 .fitness-gradient {
-  @apply bg-gradient-to-r from-[#4ade80] to-[#22c55e] dark:from-[#4ade80] dark:to-[#22c55e];
+  @apply bg-gradient-to-r from-[#b1fc31] to-[#96df1c];
+}
+
+.fitness-ring-gradient {
+  @apply bg-gradient-to-tr from-rose-500 via-rose-500 to-pink-600;
 }
 
 /* Modern Card Styles */
 .modern-card {
-  @apply backdrop-blur-md bg-card border border-slate-200 dark:border-slate-700/30 shadow-xl rounded-xl;
+  @apply backdrop-blur-md bg-card/80 border border-slate-800 shadow-xl rounded-2xl;
 }
 
-/* Glassmorphism Effect */
+/* Glass Effect Apple Style */
 .glass-card {
-  @apply backdrop-blur-lg bg-white/10 dark:bg-slate-900/20 border border-white/20 dark:border-slate-700/20 shadow-xl rounded-xl;
+  @apply backdrop-blur-lg bg-black/30 border border-slate-800/20 shadow-xl rounded-2xl;
 }
 
 /* Activity Card - Apple Fitness+ Style */
 .activity-card {
-  @apply backdrop-blur-sm bg-card/80 dark:bg-card/60 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-lg overflow-hidden;
+  @apply backdrop-blur-sm bg-card/80 rounded-2xl border border-slate-800/50 shadow-lg overflow-hidden;
 }
 
 /* Glowing effect on hover */
@@ -120,7 +99,7 @@
 
 /* Bottom Tab Navigation */
 .tab-bar {
-  @apply fixed bottom-0 left-0 right-0 flex items-center justify-around bg-card/80 dark:bg-card/80 backdrop-blur-md border-t border-slate-200/50 dark:border-slate-700/50 py-2 px-1 z-50;
+  @apply fixed bottom-0 left-0 right-0 flex items-center justify-around bg-black/80 backdrop-blur-md border-t border-slate-800/50 py-2 px-1 z-50;
 }
 
 .tab-item {
@@ -128,7 +107,7 @@
 }
 
 .tab-item.active {
-  @apply text-primary;
+  @apply text-[#b1fc31];
 }
 
 /* Progress Ring Styles */
@@ -141,14 +120,14 @@
 }
 
 .progress-ring-progress {
-  @apply absolute inset-0 rounded-full border-4 border-primary;
+  @apply absolute inset-0 rounded-full border-4 border-fitness-primary;
   transform: rotate(-90deg);
   transform-origin: center;
 }
 
 /* Fitness Stat Box */
 .fitness-stat-box {
-  @apply flex flex-col items-center justify-center p-4 rounded-2xl bg-card/80 dark:bg-card/60 border border-slate-200/50 dark:border-slate-700/50 shadow-md;
+  @apply flex flex-col items-start p-4 rounded-2xl bg-card/80 border border-slate-800/50 shadow-md;
 }
 
 /* Animations */
@@ -163,7 +142,7 @@
 
 /* Activity Selection Card */
 .activity-selection-card {
-  @apply rounded-xl border-2 border-slate-200/50 dark:border-slate-700/50 p-4 flex flex-col items-center justify-center transition-all cursor-pointer;
+  @apply rounded-xl border border-slate-800/50 p-4 flex flex-col items-center justify-center transition-all cursor-pointer;
 }
 
 .activity-selection-card.selected {
@@ -172,8 +151,8 @@
 
 /* Modern scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -181,20 +160,20 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+  @apply bg-slate-700 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400 dark:bg-slate-500;
+  @apply bg-slate-600;
 }
 
-/* IOS-like component styles */
+/* Apple Fitness+ Style Components */
 .ios-switch {
-  @apply relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300 dark:bg-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  @apply relative inline-flex h-6 w-11 items-center rounded-full bg-slate-700 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 }
 
 .ios-switch[data-state="checked"] {
-  @apply bg-primary;
+  @apply bg-[#b1fc31];
 }
 
 .ios-switch-thumb {
@@ -202,9 +181,99 @@
 }
 
 .ios-button {
-  @apply rounded-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 shadow-sm transition-all;
+  @apply rounded-full bg-[#b1fc31] text-black font-medium py-3 px-6 shadow-sm transition-all;
 }
 
 .ios-workout-item {
-  @apply bg-card/80 dark:bg-card/60 rounded-2xl p-4 flex items-center gap-4 border border-slate-200/50 dark:border-slate-700/50;
+  @apply bg-card/80 rounded-2xl p-4 flex items-center gap-4 border border-slate-800/50;
+}
+
+/* Activity Cards - Apple Fitness Style */
+.activity-box {
+  @apply p-6 rounded-2xl flex flex-col h-full;
+}
+
+.box-moves {
+  @apply bg-gradient-to-br from-rose-500 via-rose-500 to-pink-600;
+}
+
+.box-steps {
+  @apply bg-gradient-to-br from-indigo-500 to-violet-500;
+}
+
+.box-distance {
+  @apply bg-gradient-to-br from-sky-400 to-blue-500;
+}
+
+.box-energy {
+  @apply bg-gradient-to-br from-amber-400 to-orange-500;
+}
+
+/* Apple Search Bar */
+.apple-search {
+  @apply bg-slate-800/50 text-white rounded-full px-4 py-3 flex items-center;
+}
+
+/* Mobile optimizations */
+.mobile-app {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Reduce motion for better performance */
+@media (prefers-reduced-motion) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* App Header with date */
+.app-header-date {
+  @apply text-sm text-slate-500 font-medium uppercase tracking-wider;
+}
+
+/* Date display - Apple Style */
+.date-display {
+  @apply text-muted-foreground text-base font-medium uppercase tracking-wide mb-1;
+}
+
+/* Badges - Apple Style */
+.apple-badge {
+  @apply inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium bg-slate-800 text-white;
+}
+
+/* Fitness+ Button Style */
+.fitness-plus-button {
+  @apply bg-[#b1fc31] hover:bg-[#a2eb22] text-black font-semibold rounded-full px-6 py-3 transition-all;
+}
+
+/* Workout cards */
+.workout-card {
+  @apply relative overflow-hidden rounded-xl bg-slate-900 border border-slate-800/50;
+}
+
+.workout-card-image {
+  @apply aspect-[16/9] w-full object-cover;
+}
+
+.workout-card-content {
+  @apply p-4;
+}
+
+/* FitView - Component style for activity charts */
+.fit-view {
+  @apply h-24 w-full relative;
+}
+
+.fit-view-bar {
+  @apply absolute bottom-0 bg-primary/80 rounded-sm w-1.5;
+}
+
+.fit-view-grid-line {
+  @apply absolute w-full h-[1px] bg-slate-800/50;
 }

@@ -1,136 +1,161 @@
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import DailyQuote from "@/components/DailyQuote";
-import { UserProfile } from "@/types";
-import { useWorkoutPlan } from "@/hooks/useWorkoutPlan";
-import WorkoutSteps from "@/components/workout/WorkoutSteps";
-import WorkoutDisplay from "@/components/workout/WorkoutDisplay";
-import PreWorkoutWarning from "@/components/workout/PreWorkoutWarning";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ChevronDown, Search } from "lucide-react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+
+// Activity Card Component
+const ActivityCard = ({ 
+  title, 
+  imageUrl, 
+  duration, 
+  trainer 
+}: { 
+  title: string; 
+  imageUrl?: string; 
+  duration: string;
+  trainer?: string;
+}) => {
+  return (
+    <div className="workout-card">
+      {imageUrl ? (
+        <img 
+          src={imageUrl} 
+          alt={title} 
+          className="workout-card-image"
+        />
+      ) : (
+        <div className="workout-card-image bg-slate-800 flex items-center justify-center">
+          <p className="text-muted-foreground">Kein Bild verfügbar</p>
+        </div>
+      )}
+      <div className="workout-card-content">
+        <h3 className="font-medium">{title}</h3>
+        <div className="flex justify-between items-center mt-1">
+          <span className="text-sm text-muted-foreground">
+            {duration}
+            {trainer && ` • ${trainer}`}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Category Card Component
+const CategoryCard = ({ 
+  title, 
+  imageUrl 
+}: { 
+  title: string; 
+  imageUrl?: string;
+}) => {
+  return (
+    <div className="relative overflow-hidden rounded-xl aspect-square">
+      {imageUrl ? (
+        <img 
+          src={imageUrl} 
+          alt={title} 
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+          <p className="text-lg font-medium">{title}</p>
+        </div>
+      )}
+      <div className="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <p className="text-white font-medium">{title}</p>
+      </div>
+    </div>
+  );
+};
 
 const WorkoutPage = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [progressEntries, setProgressEntries] = useState<any[]>([]);
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
-  
-  // Component mounted ref to prevent state updates after unmount
-  const isMounted = useRef(true);
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    // Set the mounted flag to true when component mounts
-    isMounted.current = true;
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
     
-    // Load user profile and progress entries on mount
-    console.log("WorkoutPage mounting, loading profile and plan");
-    
-    const loadData = async () => {
-      if (!isMounted.current) return;
-      
-      setIsProfileLoading(true);
-      try {
-        // Load user profile
-        const savedProfile = localStorage.getItem("userProfile");
-        if (savedProfile && isMounted.current) {
-          try {
-            const profile = JSON.parse(savedProfile);
-            console.log("Loaded user profile:", profile);
-            setUserProfile(profile);
-          } catch (error) {
-            console.error("Fehler beim Parsen des gespeicherten Profils:", error);
-          }
-        } else {
-          console.log("No user profile found in localStorage");
-        }
-        
-        // Load progress entries
-        const savedEntries = localStorage.getItem("progressEntries");
-        if (savedEntries && isMounted.current) {
-          try {
-            setProgressEntries(JSON.parse(savedEntries));
-          } catch (error) {
-            console.error("Error parsing progress entries:", error);
-          }
-        }
-      } finally {
-        if (isMounted.current) {
-          setIsProfileLoading(false);
-        }
-      }
-    };
-    
-    loadData();
-    
-    // Cleanup when component unmounts
-    return () => {
-      isMounted.current = false;
-      console.log("WorkoutPage unmounting");
-    };
+    return () => clearTimeout(timer);
   }, []);
 
-  const {
-    workoutPlan,
-    selectedParts,
-    selectedEquipment,
-    step,
-    isLoading: isPlanLoading,
-    setSelectedEquipment,
-    handleSaveBodyParts,
-    handleReset
-  } = useWorkoutPlan(userProfile);
-
-  const handleProgressUpdate = useCallback((entry: any) => {
-    if (!isMounted.current) return;
-    
-    setProgressEntries(prevEntries => {
-      const updatedEntries = [entry, ...prevEntries];
-      localStorage.setItem("progressEntries", JSON.stringify(updatedEntries));
-      return updatedEntries;
-    });
-  }, []);
-
-  console.log("Current step:", step, "Workout plan exists:", !!workoutPlan);
-  const isLoading = isProfileLoading || isPlanLoading;
+  if (isLoading) {
+    return (
+      <Layout hideNav={false} showHeader={true} title="Fitness+">
+        <div className="flex h-[80vh] w-full items-center justify-center">
+          <LoadingSpinner size="lg" text="Wird geladen..." />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Show the daily quote at the top */}
-        <DailyQuote />
-
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-12 w-full" />
+    <Layout hideNav={false} showHeader={true} title="Fitness+">
+      <div className="space-y-8">
+        {/* Search Bar */}
+        <div className="apple-search">
+          <Search className="h-5 w-5 text-muted-foreground mr-2" />
+          <span className="text-muted-foreground">Für dich</span>
+          <ChevronDown className="h-5 w-5 text-muted-foreground ml-auto" />
+        </div>
+        
+        {/* Create Own Plan */}
+        <div className="activity-card">
+          <div className="p-6 text-center bg-black/30 border-b border-slate-800">
+            <span className="text-[#b1fc31] uppercase text-sm font-medium">Eigene Pläne</span>
+            <h2 className="text-2xl font-bold mt-1">Eigenen Plan erstellen</h2>
+            <p className="text-muted-foreground mt-2 mb-4">
+              Wähl deine Aktivitäten und leg Zeiten fest, um Woche für Woche motiviert zu bleiben.
+            </p>
+            <Button className="fitness-plus-button w-full">
+              Plan gestalten
+            </Button>
           </div>
-        ) : (
-          <>
-            {/* Show warning if no profile */}
-            <PreWorkoutWarning 
-              userProfile={userProfile} 
-              step={step} 
+        </div>
+        
+        {/* Recommended Workouts */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Fang am besten hier an</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <ActivityCard 
+              title="Krafttraining mit Gregg" 
+              imageUrl="/lovable-uploads/8544a0ed-1e92-42c6-bda4-3976577399cc.png"
+              duration="20 Min"
+              trainer="Gregg"
             />
-
-            {/* Workout steps (Step 1) */}
-            <WorkoutSteps
-              step={step}
-              selectedParts={selectedParts}
-              onSaveBodyParts={handleSaveBodyParts}
-              onSelectEquipment={setSelectedEquipment}
+            <ActivityCard 
+              title="Florenz, Italien" 
+              imageUrl="/lovable-uploads/253eff9b-492c-4eb5-974e-424a3d8faac8.png" 
+              duration="32 Min"
             />
-
-            {/* Workout display (Step 2) */}
-            <WorkoutDisplay
-              step={step}
-              workoutPlan={workoutPlan}
-              userProfile={userProfile}
-              progressEntries={progressEntries}
-              onProgressUpdate={handleProgressUpdate}
-              onReset={handleReset}
-            />
-          </>
-        )}
+          </div>
+        </div>
+        
+        {/* Activity Types */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Aktivitätsarten</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <CategoryCard title="Meditation" />
+            <CategoryCard title="Krafttraining" />
+            <CategoryCard title="HIIT" />
+          </div>
+        </div>
+        
+        {/* Achievements */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Auszeichnungen</h2>
+          <div className="activity-card p-6">
+            <h3 className="text-lg font-medium">Bleibe am Ball und hole dir neue Auszeichnungen.</h3>
+            <div className="mt-4 border border-slate-800 rounded-lg p-4">
+              <h4 className="font-medium">Wöchentliche "Fitness+"-Trainingsserie</h4>
+              <p className="text-muted-foreground text-sm mt-1">Aktuelle Serie • 0 Wochen</p>
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   );

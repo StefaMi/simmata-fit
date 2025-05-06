@@ -3,23 +3,25 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { LanguageProvider } from "./hooks/useLanguage";
-import Index from "./pages/Index";
-import LoginPage from "./pages/LoginPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import EmailConfirmedPage from "./pages/EmailConfirmedPage";
-import ProfilePage from "./pages/ProfilePage";
-import WorkoutPage from "./pages/WorkoutPage";
-import NutritionPage from "./pages/NutritionPage";
-import FocusPage from "./pages/FocusPage"; 
-import ProgressPage from "./pages/ProgressPage";
-import WorkoutBuilderPage from "./pages/WorkoutBuilderPage";
-import NotFound from "./pages/NotFound";
-import { ThemeProvider } from "@/components/theme-provider";
 import LoadingSpinner from "./components/ui/loading-spinner";
+import { ThemeProvider } from "@/components/theme-provider";
+
+// Lazy load pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
+const EmailConfirmedPage = lazy(() => import("./pages/EmailConfirmedPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const WorkoutPage = lazy(() => import("./pages/WorkoutPage"));
+const NutritionPage = lazy(() => import("./pages/NutritionPage"));
+const FocusPage = lazy(() => import("./pages/FocusPage"));
+const ProgressPage = lazy(() => import("./pages/ProgressPage"));
+const WorkoutBuilderPage = lazy(() => import("./pages/WorkoutBuilderPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin mode flag for development - set to false for production
 const ADMIN_MODE = false;
@@ -30,7 +32,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-background to-card">
+      <div className="flex h-screen w-full items-center justify-center bg-background">
         <LoadingSpinner size="lg" text="Wird geladen..." />
       </div>
     );
@@ -43,6 +45,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   return <Navigate to="/login" replace />;
 };
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex h-screen w-full items-center justify-center bg-background">
+    <LoadingSpinner size="lg" text="Wird geladen..." />
+  </div>
+);
 
 // Separate AppRoutes to prevent hook logic issues
 const AppRoutes = () => {
@@ -70,23 +79,25 @@ const AppRoutes = () => {
   }, []);
 
   return (
-    <Routes>
-      {/* Make login page always accessible */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/verify-email" element={<VerifyEmailPage />} />
-      <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
-      
-      {/* Protected routes */}
-      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
-      <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
-      <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
-      <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />
-      <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Make login page always accessible */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
+        
+        {/* Protected routes */}
+        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
+        <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
+        <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
+        <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />
+        <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 

@@ -6,28 +6,38 @@ import App from './App.tsx';
 import './index.css';
 import { registerServiceWorker } from './registerSW';
 
-// Create a client instance outside of the render function
+// Create a client instance with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      suspense: false, // Don't use React Suspense yet
     },
   },
 });
 
-// Ensure DOM is fully loaded before rendering
+// Improved rendering process with error handling
 const renderApp = () => {
-  const rootElement = document.getElementById("root");
-  
-  if (rootElement) {
-    const root = createRoot(rootElement);
-    root.render(
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    );
+  try {
+    const rootElement = document.getElementById("root");
+    
+    if (rootElement) {
+      const root = createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </React.StrictMode>
+      );
+    } else {
+      console.error("Root element not found. Cannot render application.");
+    }
+  } catch (error) {
+    console.error("Error rendering application:", error);
   }
 };
 

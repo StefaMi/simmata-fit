@@ -9,29 +9,30 @@ type Props = {
   hideNav?: boolean;
   showHeader?: boolean;
   title?: string;
+  customHeader?: ReactNode;
 };
 
 const Layout = ({ 
   children, 
   hideNav = false,
   showHeader = true,
-  title 
+  title,
+  customHeader
 }: Props) => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 pb-20">
       {showHeader && (
-        <header className="bg-card/80 dark:bg-card/60 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200/50 dark:border-slate-700/50">
+        <header className="sticky top-0 z-10 border-b border-slate-800/50 bg-background backdrop-blur-md">
           <div className="container mx-auto py-4 px-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
-                {title ? (
-                  <h1 className="text-xl font-semibold">{title}</h1>
-                ) : (
-                  <h1 className="text-xl font-semibold text-gradient">Rush</h1>
+                {customHeader ? customHeader : (
+                  <h1 className="text-xl font-semibold">
+                    {title ? title : "Rush"}
+                  </h1>
                 )}
               </div>
-              <div className="flex items-center gap-4">
-                <ModeToggle />
+              <div className="flex items-center gap-2">
                 <UserMenu />
               </div>
             </div>

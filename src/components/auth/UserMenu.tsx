@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -39,58 +39,50 @@ const UserMenu = () => {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center gap-4">
-        <Skeleton className="w-36 h-8 rounded-md" />
-      </div>
-    );
+    return <Skeleton className="h-9 w-9 rounded-full" />;
   }
 
   // If user is not logged in, show login button
   if (!user) {
     return (
       <Button 
-        variant="outline" 
+        variant="ghost" 
         size="sm" 
         onClick={() => navigate("/login")}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 text-white rounded-full p-2"
       >
-        <LogIn className="h-4 w-4" />
-        <span className="hidden sm:inline">Anmelden</span>
+        <LogIn className="h-5 w-5" />
       </Button>
     );
   }
 
-  // Get display name prioritizing firstName and lastName, falling back to other options
+  // Get display name prioritizing firstName and lastName
+  const initials = user.firstName && user.lastName 
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` 
+    : user.firstName?.charAt(0) || user.email?.charAt(0) || "U";
+
   const displayName = user.firstName && user.lastName 
     ? `${user.firstName} ${user.lastName}` 
-    : user.firstName || user.lastName || user.name || user.email;
+    : user.firstName || user.name || user.email;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center gap-2">
-          <div className="rounded-full bg-primary/10 p-1">
-            <User className="h-4 w-4 text-primary" />
-          </div>
-          <span className="hidden md:inline text-sm font-medium">{displayName}</span>
-          <Menu className="h-4 w-4 md:ml-1" />
+        <Button variant="ghost" size="icon" className="rounded-full bg-slate-600/40 h-10 w-10">
+          <div className="text-lg font-medium text-white">{initials}</div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
-          {`Hallo, ${displayName}!`}
+          {`${displayName}`}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/profile")}>
           <User className="mr-2 h-4 w-4" />
-          <span>Profil</span>
+          <span>Account</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/workout")}>
-          <span>Workout</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/nutrition")}>
-          <span>Ernährung</span>
+          <span>Fitness+</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>

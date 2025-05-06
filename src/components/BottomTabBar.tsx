@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Dumbbell, BarChart3, Settings } from "lucide-react";
+import { Home, Dumbbell, Users } from "lucide-react";
 
 const BottomTabBar = () => {
   const location = useLocation();
@@ -12,22 +12,20 @@ const BottomTabBar = () => {
       name: "Übersicht",
       path: "/",
       icon: Home,
+      activeColor: "#b1fc31"
     },
     {
       name: "Fitness+",
       path: "/workout",
       icon: Dumbbell,
+      activeColor: "#b1fc31"
     },
     {
       name: "Teilen",
       path: "/progress",
-      icon: BarChart3,
-    },
-    {
-      name: "Profil",
-      path: "/profile",
-      icon: Settings,
-    },
+      icon: Users,
+      activeColor: "#b1fc31"
+    }
   ];
 
   return (
@@ -40,10 +38,14 @@ const BottomTabBar = () => {
           <Link 
             key={tab.name} 
             to={tab.path}
-            className={`tab-item ${isActive ? "active" : ""}`}
+            className="tab-item"
           >
-            <Icon className={`h-6 w-6 ${isActive ? "" : "text-muted-foreground"}`} />
-            <span className={`text-xs mt-1 ${isActive ? "" : "text-muted-foreground"}`}>
+            <Icon 
+              className={`h-6 w-6 ${isActive ? "" : "text-muted-foreground"}`} 
+              color={isActive ? tab.activeColor : undefined}
+            />
+            <span className={`text-xs mt-1 ${isActive ? "" : "text-muted-foreground"}`}
+                 style={{ color: isActive ? tab.activeColor : undefined }}>
               {tab.name}
             </span>
           </Link>
