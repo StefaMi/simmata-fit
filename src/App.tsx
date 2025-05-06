@@ -19,18 +19,19 @@ import ProgressPage from "./pages/ProgressPage";
 import WorkoutBuilderPage from "./pages/WorkoutBuilderPage";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "@/components/theme-provider";
+import LoadingSpinner from "./components/ui/loading-spinner";
 
-// Admin mode flag for development - set to true to bypass authentication
-const ADMIN_MODE = true;
+// Admin mode flag for development - set to false for production
+const ADMIN_MODE = false;
 
-// Protected route component
+// Protected route component with improved loading state
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
   
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-background to-card">
-        <div className="animate-pulse text-primary font-bold">Lädt...</div>
+      <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-background to-card">
+        <LoadingSpinner size="lg" text="Wird geladen..." />
       </div>
     );
   }
