@@ -7,10 +7,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader } from "lucide-react";
 
 const LoginPage = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isSupabaseReady } = useAuth();
   
-  // Zeige einen Ladeindikator während der Authentifizierungsstatus überprüft wird
-  if (isLoading) {
+  // Wenn Supabase nicht konfiguriert ist, zeigen wir trotzdem das Login-Formular an
+  if (isLoading && isSupabaseReady) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center">
         <Loader className="h-8 w-8 text-primary animate-spin mb-4" />

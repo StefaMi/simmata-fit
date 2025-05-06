@@ -23,14 +23,15 @@ const ProgressPage = lazy(() => import("./pages/ProgressPage"));
 const WorkoutBuilderPage = lazy(() => import("./pages/WorkoutBuilderPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Admin mode flag for development - set to false for production
-const ADMIN_MODE = false;
+// Admin mode flag for development - set to true for demo mode
+const ADMIN_MODE = true;
 
 // Protected route component with improved loading state
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isSupabaseReady } = useAuth();
   
-  if (isLoading) {
+  // Nur wenn Supabase konfiguriert ist und noch geladen wird, zeigen wir den Ladebildschirm an
+  if (isLoading && isSupabaseReady) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <LoadingSpinner size="lg" text="Wird geladen..." />
@@ -38,8 +39,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  // In admin mode, always allow access
-  if (ADMIN_MODE || user) {
+  // In admin mode or if Supabase is not configured, always allow access
+  if (ADMIN_MODE || user || !isSupabaseReady) {
     return <>{children}</>;
   }
   

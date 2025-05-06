@@ -23,16 +23,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Show warning toast if Supabase is not configured
   useEffect(() => {
     if (!isSupabaseReady) {
+      console.log("Supabase is not configured. Continuing without authentication.");
+      setIsLoading(false);
       toast({
-        title: "Supabase not configured",
-        description: "Authentication features won't work without Supabase credentials",
-        variant: "destructive",
+        title: "Demo-Modus aktiv",
+        description: "Die App läuft im Demo-Modus ohne Authentifizierung",
       });
     }
   }, [isSupabaseReady, toast]);
 
   // Update user state when auth state changes
   useEffect(() => {
+    // Wenn Supabase nicht konfiguriert ist, muss nicht auf Auth-Änderungen gehört werden
     if (!isSupabaseReady) {
       setIsLoading(false);
       return;
@@ -79,7 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Get initial session
     const initializeAuth = async () => {
-      setIsLoading(true);
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) {
@@ -121,7 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
 
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, [isSupabaseReady, toast]);
 
