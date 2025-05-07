@@ -1,6 +1,6 @@
 # Rush – Deine persönliche Fitness App
 
-Willkommen im offiziellen Repository von **Rush**, der modernen und personalisierten Fitness-App, entwickelt mit [Lovable](https://lovable.dev).
+Willkommen im offiziellen Repository von **Rush**!
 
 ---
 
