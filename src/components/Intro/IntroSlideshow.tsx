@@ -52,7 +52,7 @@ const IntroSlideshow = () => {
 
   // Initialize audio
   useEffect(() => {
-    const audio = new Audio("/ambient-fitness.mp3");
+    const audio = new Audio("/src/assets/audio/intro.mp3");
     audioRef.current = audio;
     audio.volume = 0.3;
     
