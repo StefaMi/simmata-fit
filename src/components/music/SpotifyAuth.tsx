@@ -41,17 +41,12 @@ const SpotifyAuth = () => {
       if (!user) return;
       
       try {
-        // In a real app, we would check Supabase for the user's Spotify token
-        const { data, error } = await supabase
-          .from('spotify_connections')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-          
-        if (error) throw error;
+        // Using localStorage as a temporary solution until Supabase table is created
+        const spotifyToken = localStorage.getItem(`spotify_token_${user.id}`);
+        const tokenExpiry = localStorage.getItem(`spotify_expiry_${user.id}`);
         
         // Check if token is valid and not expired
-        const isValid = data && new Date(data.expires_at) > new Date();
+        const isValid = spotifyToken && tokenExpiry && new Date(tokenExpiry) > new Date();
         setIsAuthenticated(isValid);
       } catch (error) {
         console.log("No Spotify connection found");
@@ -108,12 +103,9 @@ const SpotifyAuth = () => {
     try {
       if (!user) throw new Error("User not logged in");
       
-      // Remove Spotify connection from Supabase
-      await supabase
-        .from('spotify_connections')
-        .delete()
-        .eq('user_id', user.id);
-      
+      // Remove Spotify data from localStorage
+      localStorage.removeItem(`spotify_token_${user.id}`);
+      localStorage.removeItem(`spotify_expiry_${user.id}`);
       localStorage.removeItem("spotify_auth_state");
       
       setIsAuthenticated(false);
@@ -142,16 +134,12 @@ const SpotifyAuth = () => {
       // In a real app, we would exchange the code for access token via a secure backend
       // For demo purposes, we'll simulate a successful authentication
       
-      // Store Spotify connection in Supabase
-      await supabase
-        .from('spotify_connections')
-        .upsert({
-          user_id: user.id,
-          access_token: 'mock-token-' + Date.now(),
-          refresh_token: 'mock-refresh-token',
-          expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour expiry
-          created_at: new Date().toISOString()
-        });
+      // Store Spotify token in localStorage temporarily
+      const mockToken = 'mock-token-' + Date.now();
+      const expiryTime = new Date(Date.now() + 3600 * 1000); // 1 hour expiry
+      
+      localStorage.setItem(`spotify_token_${user.id}`, mockToken);
+      localStorage.setItem(`spotify_expiry_${user.id}`, expiryTime.toISOString());
       
       setIsAuthenticated(true);
       toast({

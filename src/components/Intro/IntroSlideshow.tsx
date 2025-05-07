@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight, Music, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";

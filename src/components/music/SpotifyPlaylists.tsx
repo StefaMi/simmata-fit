@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,6 @@ import { Music, Play, Pause, Loader, AlertCircle, Plus, SkipBack, SkipForward, V
 import { useToast } from "@/components/ui/use-toast";
 import SpotifyAuth from "./SpotifyAuth";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Slider } from "@/components/ui/slider";
 
@@ -58,17 +56,12 @@ const SpotifyPlaylists = () => {
       if (!user) return;
       
       try {
-        // Check if user has Spotify connection in Supabase
-        const { data, error } = await supabase
-          .from('spotify_connections')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-          
-        if (error) throw error;
+        // Using localStorage as a temporary solution until Supabase table is created
+        const spotifyToken = localStorage.getItem(`spotify_token_${user.id}`);
+        const tokenExpiry = localStorage.getItem(`spotify_expiry_${user.id}`);
         
         // Check if token is valid and not expired
-        const isValid = data && new Date(data.expires_at) > new Date();
+        const isValid = spotifyToken && tokenExpiry && new Date(tokenExpiry) > new Date();
         setIsAuthenticated(isValid);
         
         if (isValid) {
