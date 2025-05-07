@@ -108,7 +108,7 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
       <BrowserRouter>
         <LanguageProvider>
           <AuthProvider>
