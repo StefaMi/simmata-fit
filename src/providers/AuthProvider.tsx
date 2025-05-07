@@ -1,133 +1,18 @@
 
-import { useState, useEffect, ReactNode } from "react";
+import { ReactNode } from "react";
 import { AuthContext } from "@/hooks/useAuth";
-import { supabaseClient, isSupabaseConfigured } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
-import { loginWithEmail, registerWithEmail, logoutUser, resetUserPassword, verifyUserEmail } from "@/utils/authUtils";
-
-type AuthUser = {
-  email: string;
-  id: string;
-  name?: string;
-  firstName?: string;
-  lastName?: string;
-  isVerified?: boolean;
-} | null;
+import { isSupabaseConfigured } from "@/lib/supabase";
+import { useAuthState } from "@/hooks/useAuthState";
+import { authService } from "@/services/authService";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const isSupabaseReady = isSupabaseConfigured();
-  const { toast } = useToast();
+  const { 
+    user, 
+    isLoading, 
+    setIsLoading,
+    isSupabaseReady 
+  } = useAuthState();
   
-  // Show warning toast if Supabase is not configured
-  useEffect(() => {
-    if (!isSupabaseReady) {
-      console.log("Supabase is not configured. Continuing without authentication.");
-      setIsLoading(false);
-      toast({
-        title: "Demo-Modus aktiv",
-        description: "Die App läuft im Demo-Modus ohne Authentifizierung",
-      });
-    }
-  }, [isSupabaseReady, toast]);
-
-  // Update user state when auth state changes
-  useEffect(() => {
-    // Wenn Supabase nicht konfiguriert ist, muss nicht auf Auth-Änderungen gehört werden
-    if (!isSupabaseReady) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      async (_event, session) => {
-        setIsLoading(true);
-        if (session?.user) {
-          // Get user profile data if available
-          let firstName = "";
-          let lastName = "";
-          
-          try {
-            const { data: profiles } = await supabaseClient
-              .from('user_profiles')
-              .select('first_name, last_name')
-              .eq('id', session.user.id)
-              .single();
-              
-            if (profiles) {
-              firstName = profiles.first_name || "";
-              lastName = profiles.last_name || "";
-            }
-          } catch (error) {
-            console.error("Error fetching user profile:", error);
-          }
-
-          setUser({
-            id: session.user.id,
-            email: session.user.email || "",
-            isVerified: session.user.email_confirmed_at ? true : false,
-            firstName,
-            lastName,
-            name: firstName ? `${firstName} ${lastName}`.trim() : session.user.email
-          });
-        } else {
-          setUser(null);
-        }
-        setIsLoading(false);
-      }
-    );
-
-    // Get initial session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) {
-          // Get user profile data if available
-          let firstName = "";
-          let lastName = "";
-          
-          try {
-            const { data: profiles } = await supabaseClient
-              .from('user_profiles')
-              .select('first_name, last_name')
-              .eq('id', session.user.id)
-              .single();
-              
-            if (profiles) {
-              firstName = profiles.first_name || "";
-              lastName = profiles.last_name || "";
-            }
-          } catch (error) {
-            console.error("Error fetching user profile:", error);
-          }
-
-          setUser({
-            id: session.user.id,
-            email: session.user.email || "",
-            isVerified: session.user.email_confirmed_at ? true : false,
-            firstName,
-            lastName,
-            name: firstName ? `${firstName} ${lastName}`.trim() : session.user.email
-          });
-        }
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
-    };
-  }, [isSupabaseReady, toast]);
-
   // Auth methods
   const login = async (email: string, password: string) => {
     if (!isSupabaseReady) {
@@ -136,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsLoading(true);
     try {
-      await loginWithEmail(email, password);
+      await authService.login(email, password);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -155,13 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsLoading(true);
     try {
-      // Log the registration attempt for debugging
-      console.log("Attempting to register user with email:", email);
-      
-      const data = await registerWithEmail(email, password, metadata);
-      console.log("Registration response:", data);
-      
-      return data;
+      return await authService.register(email, password, metadata);
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
@@ -177,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsLoading(true);
     try {
-      await logoutUser();
+      await authService.logout();
     } catch (error) {
       console.error("Logout error:", error);
       throw error;
@@ -193,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsLoading(true);
     try {
-      await resetUserPassword(email);
+      await authService.resetPassword(email);
     } catch (error) {
       console.error("Password reset error:", error);
       throw error;
@@ -207,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("Supabase ist nicht konfiguriert");
     }
     
-    return verifyUserEmail(token);
+    return authService.verifyEmail(token);
   };
 
   // Create context value object
