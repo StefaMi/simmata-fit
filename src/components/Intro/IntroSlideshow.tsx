@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { X, ChevronLeft, ChevronRight, Music, Volume2, VolumeX } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -41,63 +41,77 @@ const slides: Slide[] = [
   },
 ];
 
+const TOTAL_SLIDESHOW_DURATION = 8000; // 8 seconds total duration
+
 const IntroSlideshow = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false); // Changed to start muted
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [hasShownIntro, setHasShownIntro] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const slideshowTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize audio
- useEffect(() => {
-  const audio = new Audio(new URL('@/assets/audio/intro.mp3', import.meta.url).href);
-  audioRef.current = audio;
-  audio.volume = 0.3;
+  // Initialize audio - only load the audio, don't play automatically
+  useEffect(() => {
+    const audio = new Audio(new URL('@/assets/audio/intro.mp3', import.meta.url).href);
+    audioRef.current = audio;
+    audio.volume = 0.3;
+    audio.loop = true;
 
-  audio.addEventListener("canplaythrough", () => {
-    setAudioLoaded(true);
-    if (isPlaying) {
-      audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
-    }
-  });
+    audio.addEventListener("canplaythrough", () => {
+      setAudioLoaded(true);
+    });
 
-  return () => {
-    audio.pause();
-    audio.src = "";
-    audioRef.current = null;
-  };
-}, []);
+    return () => {
+      audio.pause();
+      audio.src = "";
+      audioRef.current = null;
+    };
+  }, []);
 
   // Check if intro has been shown before
   useEffect(() => {
     const shown = localStorage.getItem("introShown");
-    setHasShownIntro(!!shown);
-    
-    if (!shown) {
+    if (shown) {
+      setHasShownIntro(true);
+      // Immediately redirect to login if intro has been shown before
+      navigate("/login");
+    } else {
       localStorage.setItem("introShown", "true");
+      
+      // Start overall slideshow timer (8 seconds total)
+      slideshowTimerRef.current = setTimeout(() => {
+        handleSkip();
+      }, TOTAL_SLIDESHOW_DURATION);
     }
-  }, []);
+    
+    return () => {
+      if (slideshowTimerRef.current) {
+        clearTimeout(slideshowTimerRef.current);
+      }
+    };
+  }, [navigate]);
 
   // Auto-advance slides
   useEffect(() => {
     let timer: NodeJS.Timeout;
     
-    if (isPlaying) {
-      timer = setTimeout(() => {
-        if (currentSlide < slides.length - 1) {
-          setCurrentSlide(currentSlide + 1);
-        } else {
-          handleSkip();
-        }
-      }, 4000);
+    // Reset slide timer when manually changing slides
+    if (slideshowTimerRef.current) {
+      clearTimeout(slideshowTimerRef.current); 
     }
     
+    // Auto-advance slides (but not too rapidly)
+    timer = setTimeout(() => {
+      if (currentSlide < slides.length - 1) {
+        setCurrentSlide(currentSlide + 1);
+      }
+    }, 1600); // Each slide gets some time before auto-advancing
+    
     return () => clearTimeout(timer);
-  }, [currentSlide, isPlaying]);
+  }, [currentSlide]);
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
@@ -105,6 +119,7 @@ const IntroSlideshow = () => {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
+      // Only try to play when user explicitly clicks the button
       audioRef.current.play().catch(e => {
         toast({
           title: "Audio konnte nicht abgespielt werden",
@@ -118,12 +133,22 @@ const IntroSlideshow = () => {
   };
 
   const handlePrev = () => {
+    // Clear overall slideshow timer
+    if (slideshowTimerRef.current) {
+      clearTimeout(slideshowTimerRef.current);
+    }
+    
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
     }
   };
 
   const handleNext = () => {
+    // Clear overall slideshow timer
+    if (slideshowTimerRef.current) {
+      clearTimeout(slideshowTimerRef.current);
+    }
+    
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     } else {
@@ -132,14 +157,19 @@ const IntroSlideshow = () => {
   };
 
   const handleSkip = () => {
+    // Clear overall slideshow timer
+    if (slideshowTimerRef.current) {
+      clearTimeout(slideshowTimerRef.current);
+    }
+    
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    navigate("/workout");
+    navigate("/login");
   };
 
-  // If intro has been shown before, skip directly to app
+  // If intro has been shown before, don't render anything (we redirect in useEffect)
   if (hasShownIntro) {
     return null;
   }
@@ -190,11 +220,12 @@ const IntroSlideshow = () => {
           <h1 className="text-3xl font-bold mb-4 text-center">{slide.title}</h1>
           <p className="text-center text-lg max-w-md mb-8">{slide.description}</p>
           
-          {currentSlide === slides.length - 1 ? (
+          <div className="flex flex-col items-center gap-6">
+            {/* Skip button always visible */}
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleSkip}>
-              Zur App
+              Jetzt starten
             </Button>
-          ) : (
+            
             <div className="flex items-center gap-4">
               <Button 
                 variant="outline" 
@@ -224,7 +255,7 @@ const IntroSlideshow = () => {
                 <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
