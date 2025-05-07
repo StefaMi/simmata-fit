@@ -1,12 +1,12 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SlideContent from "./SlideContent";
 import SlideNavigation from "./SlideNavigation";
 import AudioControl from "./AudioControl";
-import { useIntroState } from "./useIntroState";
+import { useIntroState } from "@/hooks/useIntroState";
 import { slides } from "./slideData";
 
 const IntroSlideshow: React.FC = () => {
@@ -20,6 +20,9 @@ const IntroSlideshow: React.FC = () => {
     toggleAudio,
     slideshowTimerRef
   } = useIntroState();
+
+  // Memoize the next handler to prevent recreating it on every render
+  const memoizedHandleNext = useCallback(() => handleNext(slides.length), [handleNext, slides.length]);
 
   // Auto-advance slides
   useEffect(() => {
@@ -36,7 +39,7 @@ const IntroSlideshow: React.FC = () => {
     // Auto-advance slides (but not too rapidly)
     timer = setTimeout(() => {
       if (currentSlide < slides.length - 1) {
-        handleNext(slides.length);
+        memoizedHandleNext();
       } else {
         // On last slide, redirect after a short delay
         setTimeout(() => handleSkip(), 1000);
@@ -44,7 +47,7 @@ const IntroSlideshow: React.FC = () => {
     }, 1600); // Each slide gets some time before auto-advancing
     
     return () => clearTimeout(timer);
-  }, [currentSlide, hasShownIntro, handleNext, handleSkip, slideshowTimerRef]);
+  }, [currentSlide, hasShownIntro, memoizedHandleNext, handleSkip, slideshowTimerRef]);
 
   // If intro has been shown before, don't render anything (we redirect in useEffect)
   if (hasShownIntro) {
@@ -82,7 +85,7 @@ const IntroSlideshow: React.FC = () => {
           currentSlide={currentSlide}
           totalSlides={slides.length}
           onPrev={handlePrev}
-          onNext={() => handleNext(slides.length)}
+          onNext={memoizedHandleNext}
           onSkip={handleSkip}
         />
       </div>
@@ -90,4 +93,4 @@ const IntroSlideshow: React.FC = () => {
   );
 };
 
-export default IntroSlideshow;
+export default React.memo(IntroSlideshow);

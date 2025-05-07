@@ -33,7 +33,7 @@ const ADMIN_MODE = true;
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading, isSupabaseReady } = useAuth();
   
-  // Nur wenn Supabase konfiguriert ist und noch geladen wird, zeigen wir den Ladebildschirm an
+  // Only show loading screen if Supabase is configured and still loading
   if (isLoading && isSupabaseReady) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -61,6 +61,7 @@ const PageLoader = () => (
 const AppRoutes = () => {
   const [appReady, setAppReady] = useState(false);
   const { isLoading, isSupabaseReady } = useAuth();
+  const [showIntro, setShowIntro] = useState<boolean>(true);
   
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
@@ -69,18 +70,9 @@ const AppRoutes = () => {
     
     document.body.classList.add("mobile-app");
     
-    // Hardware back button handling for Android
-    const handleBackButton = () => {
-      if (window.history.state && window.history.state.idx > 0) {
-        window.history.back();
-      } else {
-        if (window.confirm("Möchtest du die App wirklich verlassen?")) {
-          // The app would close here on native devices
-        }
-      }
-    };
-
-    window.addEventListener("popstate", handleBackButton);
+    // Determine whether to show intro based on localStorage
+    const introShown = localStorage.getItem("introShown");
+    setShowIntro(!introShown);
     
     // Mark the app as ready once loading is complete
     if (!isLoading) {
@@ -93,14 +85,13 @@ const AppRoutes = () => {
     
     return () => {
       document.body.classList.remove("mobile-app");
-      window.removeEventListener("popstate", handleBackButton);
     };
   }, [isLoading, isSupabaseReady]);
 
   return (
     <>
-      {/* Only show IntroSlideshow on initial load before app is ready */}
-      <IntroSlideshow />
+      {/* Only show IntroSlideshow when needed */}
+      {showIntro && <IntroSlideshow />}
       
       <Suspense fallback={<PageLoader />}>
         <Routes>
