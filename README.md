@@ -1,26 +1,47 @@
-# Welcome to your Lovable project
+# Rush – Deine persönliche Fitness App
 
-## Project info
+Willkommen im offiziellen Repository von **Rush**, der modernen und personalisierten Fitness-App, entwickelt mit [Lovable](https://lovable.dev).
 
-**URL**: https://lovable.dev/projects/f2574aca-3624-4964-a286-edbcbf4c2b4a
+---
 
-## How can I edit this code?
+## 🚀 Projekt-URL
 
-There are several ways of editing your application.
+**Live:** [https://rush.fit](https://rush.fit)  
+**Lovable-Editor:** https://lovable.dev/projects/f2574aca-3624-4964-a286-edbcbf4c2b4a
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f2574aca-3624-4964-a286-edbcbf4c2b4a) and start prompting.
+## 🧠 Was ist Rush?
 
-Changes made via Lovable will be committed automatically to this repo.
+Rush ist eine individuell anpassbare Fitness-App, die Nutzern ermöglicht:
+- personalisierte Trainingspläne zu erstellen,
+- gespeicherte Pläne nach erneutem Login wieder anzuzeigen,
+- Fokusübungen (z. B. Nesma, Atmung) zu absolvieren,
+- Spotify zu integrieren (OAuth),
+- zwischen Dark & Light Mode zu wechseln.
 
-**Use your preferred IDE**
+Rush ist **PWA-fähig** und funktioniert wie eine native App – direkt vom Startbildschirm.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠 Tech Stack
 
-Follow these steps:
+- **Framework:** React + Vite
+- **Sprache:** TypeScript
+- **UI-Bibliothek:** shadcn/ui + TailwindCSS
+- **Auth & Datenbank:** Supabase
+- **Hosting:** Render.com
+- **Icons:** Lucide React
+
+---
+
+## 🧪 Lokale Entwicklung
+
+```bash
+git clone https://github.com/StefaMi/simmata-fit.git
+cd simmata-fit
+npm install
+npm run dev
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -36,38 +57,35 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+🌙 Dark & Light Mode
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Rush besitzt einen Darkmode/Lightmode-Umschalter mit localStorage-Persistenz und responsiver Anpassung.
+📦 Geplante Features bis zum Teststart
 
-**Use GitHub Codespaces**
+    ✅ Trainingsplan-Speicherung pro User
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+    ✅ Darkmode/Lightmode Toggle
 
-## What technologies are used for this project?
+    ✅ Spotify Login & Integration
 
-This project is built with:
+    ✅ Fokusübungen
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+    ✅ Push-to-Home Installation
 
-## How can I deploy this project?
+    🟡 Fortschrittsanzeige / ToDo-Komponenten
 
-Simply open [Lovable](https://lovable.dev/projects/f2574aca-3624-4964-a286-edbcbf4c2b4a) and click on Share -> Publish.
+    🟡 Plananzeige nach Erstellung mit Wochentagen
 
-## Can I connect a custom domain to my Lovable project?
+    🟡 Persistenz bei Login + Anzeige gespeicherter Pläne
 
-Yes, you can!
+🧼 Deployment-Domain
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Die finale Domain lautet: rush.fit
+Deployed über: Render.com
+👤 Autor
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Milad-Stefan Stefan
+GitHub Portfolio
+Render Version
+
+📧 miladstefan28@proton.me
