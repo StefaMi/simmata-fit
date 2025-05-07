@@ -4,6 +4,7 @@
 @tailwind utilities;
 
 @layer base {
+  /* Dark mode (default) variables */
   :root {
     --background: 220 26% 7%;
     --foreground: 0 0% 98%;
@@ -45,6 +46,45 @@
     --fitness-background: 220 26% 7%;
     --fitness-card: 222 20% 12%;
     --fitness-text: 0 0% 98%;
+  }
+
+  /* Light mode variables */
+  :root.light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 142.1 76.2% 46.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+
+    --secondary: 142.1 65% 42%;
+    --secondary-foreground: 355.7 100% 97.3%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 142.1 55% 60%;
+    --accent-foreground: 355.7 100% 97.3%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 142.1 76.2% 46.3%;
+
+    /* Fitness-Spezifische Farben */
+    --fitness-primary: 85 80% 46%;
+    --fitness-secondary: 142.1 70% 35%;
+    --fitness-accent: 142.1 65% 40%;
+    --fitness-background: 0 0% 100%;
+    --fitness-card: 0 0% 98%;
+    --fitness-text: 240 10% 3.9%;
   }
 
   body {

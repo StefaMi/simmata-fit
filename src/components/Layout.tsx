@@ -1,8 +1,8 @@
 
 import { ReactNode } from "react";
 import BottomTabBar from "@/components/BottomTabBar";
-import { ModeToggle } from "@/components/ModeToggle";
 import UserMenu from "@/components/auth/UserMenu";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Props = {
   children: ReactNode;
@@ -33,6 +33,7 @@ const Layout = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
+                <ThemeToggle />
                 <UserMenu />
               </div>
             </div>

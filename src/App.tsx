@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +6,7 @@ import { useEffect, Suspense, lazy } from "react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { LanguageProvider } from "./hooks/useLanguage";
 import LoadingSpinner from "./components/ui/loading-spinner";
-import { ThemeProvider } from "@/components/theme-provider";
+import { initializeTheme } from "./utils/theme";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -60,6 +59,9 @@ const PageLoader = () => (
 const AppRoutes = () => {
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
+    // Initialize theme
+    initializeTheme();
+    
     document.body.classList.add("mobile-app");
     
     // Hardware back button handling for Android
@@ -108,19 +110,17 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-      <BrowserRouter>
-        <LanguageProvider>
-          <AuthProvider>
-            <TooltipProvider>
-              <AppRoutes />
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </AuthProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+    <BrowserRouter>
+      <LanguageProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <AppRoutes />
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </BrowserRouter>
   );
 }
 
