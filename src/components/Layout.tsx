@@ -20,7 +20,7 @@ const Layout = ({
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       {showHeader && (
-        <header className="sticky top-0 z-10 border-b border-slate-800/50 bg-background backdrop-blur-md">
+        <header className="sticky top-0 z-10 border-b border-slate-200/20 dark:border-slate-800/50 bg-background/80 backdrop-blur-md">
           <div className="container mx-auto py-4 px-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">

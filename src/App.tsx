@@ -3,11 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy, useState } from "react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { LanguageProvider } from "./hooks/useLanguage";
 import LoadingSpinner from "./components/ui/loading-spinner";
 import { initializeTheme } from "./utils/theme";
+import IntroSlideshow from "./components/Intro/IntroSlideshow";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -58,6 +59,8 @@ const PageLoader = () => (
 
 // Separate AppRoutes to prevent hook logic issues
 const AppRoutes = () => {
+  const [showIntro, setShowIntro] = useState(true);
+  
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
     // Initialize theme
@@ -85,27 +88,30 @@ const AppRoutes = () => {
   }, []);
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        {/* Make login page always accessible */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
-        <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
-        
-        {/* Protected routes */}
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-        <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
-        <Route path="/workout-dashboard" element={<ProtectedRoute><WorkoutDashboardPage /></ProtectedRoute>} />
-        <Route path="/share" element={<ProtectedRoute><SharePage /></ProtectedRoute>} />
-        <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
-        <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
-        <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />
-        <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+    <>
+      <IntroSlideshow />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Make login page always accessible */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
+          
+          {/* Protected routes */}
+          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
+          <Route path="/workout-dashboard" element={<ProtectedRoute><WorkoutDashboardPage /></ProtectedRoute>} />
+          <Route path="/share" element={<ProtectedRoute><SharePage /></ProtectedRoute>} />
+          <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
+          <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
+          <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />
+          <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
   );
 };
 

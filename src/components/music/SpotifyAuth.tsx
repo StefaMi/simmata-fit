@@ -2,13 +2,23 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Music } from "lucide-react";
+import { Music, Loader } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 // Spotify API endpoints and configuration
 const SPOTIFY_AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
-const SPOTIFY_CLIENT_ID = "your-client-id"; // You should replace this with your actual client ID
+const SPOTIFY_CLIENT_ID = "1a2b3c4d5e6f7g8h9i0j"; // Replace with actual client ID in production
 const REDIRECT_URI = window.location.origin + "/spotify-callback";
-const SCOPES = ["user-read-private", "user-read-email", "playlist-read-private", "user-library-read", "streaming", "user-read-playback-state", "user-modify-playback-state"];
+const SCOPES = [
+  "user-read-private", 
+  "user-read-email", 
+  "playlist-read-private", 
+  "user-library-read", 
+  "streaming", 
+  "user-read-playback-state", 
+  "user-modify-playback-state"
+];
 
 const generateRandomString = (length: number) => {
   let text = "";
@@ -21,84 +31,142 @@ const generateRandomString = (length: number) => {
 
 const SpotifyAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Check if user is already authenticated with Spotify on mount
   useEffect(() => {
-    const spotifyToken = localStorage.getItem("spotify_token");
-    const tokenExpiry = localStorage.getItem("spotify_token_expiry");
-    
-    if (spotifyToken && tokenExpiry) {
-      const isExpired = Date.now() > parseInt(tokenExpiry);
-      setIsAuthenticated(!isExpired);
+    const checkSpotifyAuth = async () => {
+      if (!user) return;
       
-      // If token is expired, remove it
-      if (isExpired) {
-        localStorage.removeItem("spotify_token");
-        localStorage.removeItem("spotify_token_expiry");
+      try {
+        // In a real app, we would check Supabase for the user's Spotify token
+        const { data, error } = await supabase
+          .from('spotify_connections')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (error) throw error;
+        
+        // Check if token is valid and not expired
+        const isValid = data && new Date(data.expires_at) > new Date();
+        setIsAuthenticated(isValid);
+      } catch (error) {
+        console.log("No Spotify connection found");
+        setIsAuthenticated(false);
       }
-    }
+    };
+    
+    checkSpotifyAuth();
 
     // Check URL for Spotify auth callback
-    const urlParams = new URLSearchParams(window.location.search);
-    const spotifyCode = urlParams.get('code');
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    const storedState = localStorage.getItem("spotify_auth_state");
     
-    if (spotifyCode) {
-      handleSpotifyCallback(spotifyCode);
-      // Remove code from URL to prevent repeated auth attempts
+    if (code && state && storedState === state) {
+      handleSpotifyCallback(code);
+      // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []);
+  }, [user]);
 
   const handleLogin = () => {
-    const state = generateRandomString(16);
-    localStorage.setItem("spotify_auth_state", state);
-
-    const authUrl = new URL(SPOTIFY_AUTH_ENDPOINT);
-    authUrl.searchParams.append("client_id", SPOTIFY_CLIENT_ID);
-    authUrl.searchParams.append("response_type", "code");
-    authUrl.searchParams.append("redirect_uri", REDIRECT_URI);
-    authUrl.searchParams.append("state", state);
-    authUrl.searchParams.append("scope", SCOPES.join(" "));
+    setIsLoading(true);
     
-    // Redirect to Spotify auth page
-    window.location.href = authUrl.toString();
+    try {
+      const state = generateRandomString(16);
+      localStorage.setItem("spotify_auth_state", state);
+
+      const authParams = new URLSearchParams({
+        client_id: SPOTIFY_CLIENT_ID,
+        response_type: 'code',
+        redirect_uri: REDIRECT_URI,
+        state: state,
+        scope: SCOPES.join(" ")
+      });
+      
+      // Redirect to Spotify auth page
+      window.location.href = `${SPOTIFY_AUTH_ENDPOINT}?${authParams.toString()}`;
+    } catch (error) {
+      console.error("Error initiating Spotify auth:", error);
+      toast({
+        title: "Fehler bei der Spotify-Authentifizierung",
+        description: "Bitte versuche es erneut.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("spotify_token");
-    localStorage.removeItem("spotify_token_expiry");
-    setIsAuthenticated(false);
-    toast({
-      title: "Spotify getrennt",
-      description: "Du wurdest erfolgreich von Spotify abgemeldet.",
-    });
+  const handleLogout = async () => {
+    setIsLoading(true);
+    
+    try {
+      if (!user) throw new Error("User not logged in");
+      
+      // Remove Spotify connection from Supabase
+      await supabase
+        .from('spotify_connections')
+        .delete()
+        .eq('user_id', user.id);
+      
+      localStorage.removeItem("spotify_auth_state");
+      
+      setIsAuthenticated(false);
+      toast({
+        title: "Spotify getrennt",
+        description: "Du wurdest erfolgreich von Spotify abgemeldet.",
+      });
+    } catch (error) {
+      console.error("Error disconnecting Spotify:", error);
+      toast({
+        title: "Fehler beim Trennen",
+        description: "Bitte versuche es erneut.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSpotifyCallback = async (code: string) => {
+    setIsLoading(true);
+    
     try {
-      // In a real application, we'd make a server-side request to exchange the code for a token
-      // For demo purposes, we're simulating a successful authentication
+      if (!user) throw new Error("User not logged in");
+      
+      // In a real app, we would exchange the code for access token via a secure backend
+      // For demo purposes, we'll simulate a successful authentication
+      
+      // Store Spotify connection in Supabase
+      await supabase
+        .from('spotify_connections')
+        .upsert({
+          user_id: user.id,
+          access_token: 'mock-token-' + Date.now(),
+          refresh_token: 'mock-refresh-token',
+          expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour expiry
+          created_at: new Date().toISOString()
+        });
+      
+      setIsAuthenticated(true);
       toast({
         title: "Spotify verbunden",
         description: "Du wurdest erfolgreich mit Spotify verbunden.",
       });
-      
-      // Simulate token storage (in a real app, you'd get this from the server)
-      const mockToken = "mock-spotify-token";
-      const expiresIn = 3600; // 1 hour
-      
-      localStorage.setItem("spotify_token", mockToken);
-      localStorage.setItem("spotify_token_expiry", (Date.now() + expiresIn * 1000).toString());
-      
-      setIsAuthenticated(true);
     } catch (error) {
-      console.error("Error authenticating with Spotify:", error);
+      console.error("Error handling Spotify callback:", error);
       toast({
         title: "Fehler bei der Verbindung",
         description: "Es gab ein Problem bei der Verbindung mit Spotify.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,8 +174,13 @@ const SpotifyAuth = () => {
     <Button 
       className={isAuthenticated ? "bg-green-500 hover:bg-green-600" : "bg-black hover:bg-gray-800"} 
       onClick={isAuthenticated ? handleLogout : handleLogin}
+      disabled={isLoading}
     >
-      <Music className="mr-2 h-4 w-4" />
+      {isLoading ? (
+        <Loader className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <Music className="h-4 w-4 mr-2" />
+      )}
       {isAuthenticated ? "Spotify trennen" : "Mit Spotify verbinden"}
     </Button>
   );
