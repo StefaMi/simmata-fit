@@ -59,7 +59,8 @@ const PageLoader = () => (
 
 // Separate AppRoutes to prevent hook logic issues
 const AppRoutes = () => {
-  const [showIntro, setShowIntro] = useState(true);
+  const [appReady, setAppReady] = useState(false);
+  const { isLoading, isSupabaseReady } = useAuth();
   
   // For mobile adjustments (status bar height, soft keyboard, etc.)
   useEffect(() => {
@@ -81,15 +82,26 @@ const AppRoutes = () => {
 
     window.addEventListener("popstate", handleBackButton);
     
+    // Mark the app as ready once loading is complete
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setAppReady(true);
+      }, 300); // Small delay to ensure everything is loaded
+      
+      return () => clearTimeout(timer);
+    }
+    
     return () => {
       document.body.classList.remove("mobile-app");
       window.removeEventListener("popstate", handleBackButton);
     };
-  }, []);
+  }, [isLoading, isSupabaseReady]);
 
   return (
     <>
+      {/* Only show IntroSlideshow on initial load before app is ready */}
       <IntroSlideshow />
+      
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Make login page always accessible */}

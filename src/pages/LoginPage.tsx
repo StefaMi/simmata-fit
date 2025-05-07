@@ -19,9 +19,9 @@ const LoginPage = () => {
     );
   }
   
-  // Redirect to profile if the user is already logged in
+  // Redirect to workout page if the user is already logged in
   if (user) {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/" replace />;
   }
   
   return (

@@ -45,7 +45,7 @@ const TOTAL_SLIDESHOW_DURATION = 8000; // 8 seconds total duration
 
 const IntroSlideshow = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false); // Changed to start muted
+  const [isPlaying, setIsPlaying] = useState(false); // Start muted
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [hasShownIntro, setHasShownIntro] = useState(false);
   const navigate = useNavigate();
@@ -55,30 +55,38 @@ const IntroSlideshow = () => {
 
   // Initialize audio - only load the audio, don't play automatically
   useEffect(() => {
-    const audio = new Audio(new URL('@/assets/audio/intro.mp3', import.meta.url).href);
-    audioRef.current = audio;
-    audio.volume = 0.3;
-    audio.loop = true;
+    try {
+      const audio = new Audio(new URL('@/assets/audio/intro.mp3', import.meta.url).href);
+      audioRef.current = audio;
+      audio.volume = 0.3;
+      audio.loop = true;
 
-    audio.addEventListener("canplaythrough", () => {
-      setAudioLoaded(true);
-    });
+      audio.addEventListener("canplaythrough", () => {
+        setAudioLoaded(true);
+      });
 
-    return () => {
-      audio.pause();
-      audio.src = "";
-      audioRef.current = null;
-    };
+      return () => {
+        audio.pause();
+        audio.src = "";
+        audioRef.current = null;
+      };
+    } catch (error) {
+      console.error("Failed to load audio:", error);
+    }
   }, []);
 
-  // Check if intro has been shown before
+  // Check if intro has been shown before and handle redirects
   useEffect(() => {
+    // Check localStorage first
     const shown = localStorage.getItem("introShown");
+    
     if (shown) {
       setHasShownIntro(true);
       // Immediately redirect to login if intro has been shown before
       navigate("/login");
+      return; // Exit early to prevent timer setup
     } else {
+      // Set flag in localStorage so intro is only shown once
       localStorage.setItem("introShown", "true");
       
       // Start overall slideshow timer (8 seconds total)
@@ -96,6 +104,9 @@ const IntroSlideshow = () => {
 
   // Auto-advance slides
   useEffect(() => {
+    // Only set up this effect if we're actually showing the intro
+    if (hasShownIntro) return;
+    
     let timer: NodeJS.Timeout;
     
     // Reset slide timer when manually changing slides
@@ -107,11 +118,14 @@ const IntroSlideshow = () => {
     timer = setTimeout(() => {
       if (currentSlide < slides.length - 1) {
         setCurrentSlide(currentSlide + 1);
+      } else {
+        // On last slide, redirect after a short delay
+        setTimeout(() => handleSkip(), 1000);
       }
     }, 1600); // Each slide gets some time before auto-advancing
     
     return () => clearTimeout(timer);
-  }, [currentSlide]);
+  }, [currentSlide, hasShownIntro]);
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
