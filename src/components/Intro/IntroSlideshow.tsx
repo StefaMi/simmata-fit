@@ -51,26 +51,26 @@ const IntroSlideshow = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio
-  useEffect(() => {
-    const audio = new Audio("/src/assets/audio/intro.mp3");
-    audioRef.current = audio;
-    audio.volume = 0.3;
-    
-    audio.addEventListener("canplaythrough", () => {
-      setAudioLoaded(true);
-      if (isPlaying) {
-        audio.play().catch(error => {
-          console.error("Error playing audio:", error);
-        });
-      }
-    });
-    
-    return () => {
-      audio.pause();
-      audio.src = "";
-      audioRef.current = null;
-    };
-  }, []);
+ useEffect(() => {
+  const audio = new Audio(new URL('@/assets/audio/intro.mp3', import.meta.url).href);
+  audioRef.current = audio;
+  audio.volume = 0.3;
+
+  audio.addEventListener("canplaythrough", () => {
+    setAudioLoaded(true);
+    if (isPlaying) {
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+  });
+
+  return () => {
+    audio.pause();
+    audio.src = "";
+    audioRef.current = null;
+  };
+}, []);
 
   // Check if intro has been shown before
   useEffect(() => {
