@@ -17,6 +17,8 @@ const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
 const EmailConfirmedPage = lazy(() => import("./pages/EmailConfirmedPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const WorkoutPage = lazy(() => import("./pages/WorkoutPage"));
+const WorkoutDashboardPage = lazy(() => import("./pages/WorkoutDashboardPage"));
+const SharePage = lazy(() => import("./pages/SharePage"));
 const NutritionPage = lazy(() => import("./pages/NutritionPage"));
 const FocusPage = lazy(() => import("./pages/FocusPage"));
 const ProgressPage = lazy(() => import("./pages/ProgressPage"));
@@ -92,6 +94,8 @@ const AppRoutes = () => {
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/workout" element={<ProtectedRoute><WorkoutPage /></ProtectedRoute>} />
+        <Route path="/workout-dashboard" element={<ProtectedRoute><WorkoutDashboardPage /></ProtectedRoute>} />
+        <Route path="/share" element={<ProtectedRoute><SharePage /></ProtectedRoute>} />
         <Route path="/workout-builder" element={<ProtectedRoute><WorkoutBuilderPage /></ProtectedRoute>} />
         <Route path="/nutrition" element={<ProtectedRoute><NutritionPage /></ProtectedRoute>} />
         <Route path="/focus" element={<ProtectedRoute><FocusPage /></ProtectedRoute>} />

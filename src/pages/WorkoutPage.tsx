@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, ArrowRight } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Activity Card Component
 const ActivityCard = ({ 
@@ -74,11 +75,19 @@ const CategoryCard = ({
 
 const WorkoutPage = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasSavedPlan, setHasSavedPlan] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user has a saved workout plan
+    const checkSavedPlan = () => {
+      const savedPlan = localStorage.getItem("workoutPlan");
+      setHasSavedPlan(!!savedPlan);
+    };
+    
     // Simulate data loading
     const timer = setTimeout(() => {
+      checkSavedPlan();
       setIsLoading(false);
     }, 500);
     
@@ -87,6 +96,10 @@ const WorkoutPage = () => {
 
   const handleCreatePlan = () => {
     navigate("/workout-builder");
+  };
+  
+  const handleViewPlan = () => {
+    navigate("/workout-dashboard");
   };
 
   if (isLoading) {
@@ -109,22 +122,42 @@ const WorkoutPage = () => {
           <ChevronDown className="h-5 w-5 text-muted-foreground ml-auto" />
         </div>
         
-        {/* Create Own Plan */}
-        <div className="activity-card">
-          <div className="p-6 text-center bg-black/30 border-b border-slate-800">
-            <span className="text-[#b1fc31] uppercase text-sm font-medium">Eigene Pläne</span>
-            <h2 className="text-2xl font-bold mt-1">Eigenen Plan erstellen</h2>
-            <p className="text-muted-foreground mt-2 mb-4">
-              Wähl deine Aktivitäten und leg Zeiten fest, um Woche für Woche motiviert zu bleiben.
-            </p>
-            <Button 
-              className="fitness-plus-button w-full"
-              onClick={handleCreatePlan}
-            >
-              Plan gestalten
-            </Button>
+        {/* Workout Plan Actions */}
+        {hasSavedPlan ? (
+          <Card className="backdrop-blur-md bg-background/80 border border-slate-200 dark:border-slate-800">
+            <CardHeader>
+              <CardTitle>Dein Trainingsplan</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p>Du hast bereits einen personalisierten Trainingsplan erstellt. Setze dein Training fort oder erstelle einen neuen Plan.</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button className="flex-1" onClick={handleViewPlan}>
+                  Trainingsplan fortsetzen
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button variant="outline" className="flex-1" onClick={handleCreatePlan}>
+                  Neuen Plan erstellen
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="activity-card">
+            <div className="p-6 text-center bg-black/30 border-b border-slate-800">
+              <span className="text-[#b1fc31] uppercase text-sm font-medium">Eigene Pläne</span>
+              <h2 className="text-2xl font-bold mt-1">Eigenen Plan erstellen</h2>
+              <p className="text-muted-foreground mt-2 mb-4">
+                Wähl deine Aktivitäten und leg Zeiten fest, um Woche für Woche motiviert zu bleiben.
+              </p>
+              <Button 
+                className="fitness-plus-button w-full"
+                onClick={handleCreatePlan}
+              >
+                Plan gestalten
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Recommended Workouts */}
         <div>

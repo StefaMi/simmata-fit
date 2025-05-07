@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,7 @@ import BodyPartSelector from "@/components/workout-builder/BodyPartSelector";
 import PlanSummary from "@/components/workout-builder/PlanSummary";
 import { BodyPart } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
+import { generateWeeklyWorkoutPlan } from "@/utils/weeklyPlanGenerator";
 import { v4 as uuidv4 } from "uuid";
 
 // Steps enum for better readability
@@ -32,6 +34,16 @@ const WorkoutBuilderPage = () => {
   const [selectedActivities, setSelectedActivities] = useState<string[]>(["strength", "cardio"]);
   const [selectedBodyParts, setSelectedBodyParts] = useState<BodyPart[]>(["chest", "back", "legs"]);
   const [isMounted, setIsMounted] = useState<boolean>(true);
+
+  // Mock user profile for plan generation
+  const mockUserProfile = {
+    firstName: "User",
+    gender: "male",
+    age: 30,
+    height: 175,
+    weight: 75,
+    goal: "build"
+  };
 
   // Activity options for reference in summary
   const activityOptions = [
@@ -155,30 +167,43 @@ const WorkoutBuilderPage = () => {
   const createWorkoutPlan = () => {
     if (!isMounted) return;
     
-    // Create simple workout plan object
-    const workoutPlan = {
-      id: uuidv4(),
-      name: "Mein Trainingsplan",
-      description: `${planDuration}-Wochen Trainingsplan (${weeklyFrequency}x pro Woche)`,
-      planDuration,
-      weeklyFrequency,
-      sessionDuration,
-      activities: selectedActivities,
-      bodyParts: selectedBodyParts,
-      createdAt: new Date().toISOString(),
-    };
-    
-    // Save to localStorage
-    localStorage.setItem("customWorkoutPlan", JSON.stringify(workoutPlan));
-    
-    // Show success toast
-    toast({
-      title: "Trainingsplan erstellt!",
-      description: "Dein personalisierter Trainingsplan wurde erfolgreich erstellt."
-    });
-    
-    // Navigate to workout page to see the plan
-    navigate("/workout");
+    try {
+      // Generate a workout plan using the utility function
+      const workoutPlan = generateWeeklyWorkoutPlan(
+        selectedBodyParts,
+        mockUserProfile,
+        weeklyFrequency
+      );
+      
+      // Add additional metadata
+      const enhancedPlan = {
+        ...workoutPlan,
+        planDuration,
+        sessionDuration,
+        activities: selectedActivities,
+        selectedBodyParts,
+        createdAt: new Date().toISOString(),
+      };
+      
+      // Save to localStorage
+      localStorage.setItem("workoutPlan", JSON.stringify(enhancedPlan));
+      
+      // Show success toast
+      toast({
+        title: "Trainingsplan erstellt!",
+        description: "Dein personalisierter Trainingsplan wurde erfolgreich erstellt."
+      });
+      
+      // Navigate to workout dashboard to see the plan
+      navigate("/workout-dashboard");
+    } catch (error) {
+      console.error("Error creating workout plan:", error);
+      toast({
+        title: "Fehler",
+        description: "Es gab ein Problem beim Erstellen des Trainingsplans.",
+        variant: "destructive"
+      });
+    }
   };
 
   const { title, subtitle } = getStepInfo();
